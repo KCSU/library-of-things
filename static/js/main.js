@@ -1,0 +1,53 @@
+function initLightbox() {
+  const lightboxHTML = `
+    <div id="lightbox-overlay" class="lightbox-overlay">
+      <div class="lightbox-content">
+        <img id="lightbox-image" class="lightbox-image" src="" alt="">
+      </div>
+    </div>
+  `;
+  $('body').append(lightboxHTML);
+
+  const $overlay = $('#lightbox-overlay');
+  const $lightboxImage = $('#lightbox-image');
+
+  function openLightbox(imageSrc, imageAlt) {
+    $lightboxImage.attr('src', imageSrc);
+    $lightboxImage.attr('alt', imageAlt || '');
+    $overlay.addClass('active');
+    $('body').css('overflow', 'hidden'); // Prevent background scrolling
+  }
+
+  function closeLightbox() {
+    $overlay.removeClass('active');
+    $('body').css('overflow', ''); // Restore scrolling
+  }
+
+  // Close on overlay click (but not on image click)
+  $overlay.on('click', function (e) {
+    if (e.target === this) {
+      closeLightbox();
+    }
+  });
+
+  // Close on Escape key
+  $(document).on('keydown', function (e) {
+    if (e.key === 'Escape' && $overlay.hasClass('active')) {
+      closeLightbox();
+    }
+  });
+
+  function attachImageListeners() {
+    $('.card img').off('click.lightbox').on('click.lightbox', function () {
+      openLightbox(this.src, this.alt);
+    });
+  }
+
+  attachImageListeners();
+
+  $(document).on('click', '.card img', function () {
+    openLightbox(this.src, this.alt);
+  });
+}
+
+$(document).ready(initLightbox);

@@ -1,0 +1,79 @@
+{% from 'icons.jinja' import category_icon %}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library of Things - KCSU</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/basecoat.cdn.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+
+<aside class="sidebar" data-side="left" aria-hidden="false">
+  <nav aria-label="Sidebar navigation">
+    <header>
+      <a href="/" class="btn-ghost p-2 h-12 w-full justifwy-start">
+        <div
+          class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+          <img class="rounded-sm" src="{{ url_for('static', filename='images/logo.jpg') }}">
+        </div>
+        <div class="grid flex-1 text-left text-sm leading-tight">
+          <span class="truncate font-medium">Library of Things</span>
+          <span class="truncate text-xs">v0.1.0</span>
+        </div>
+      </a>
+    </header>
+    <section class="scrollbar">
+      <div role="group" aria-labelledby="group-label-content-1">
+        <h3>Categories</h3>
+        <ul>
+          <li>
+            <a href="javascript:void(0)">{{ category_icon('clothing') }}<span>Clothing</span></a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">{{ category_icon('kitchenware') }}<span>Kitchenware</span></a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">{{ category_icon('sports') }}<span>Sports</span></a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">{{ category_icon('electronics') }}<span>Electronics</span></a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">{{ category_icon('others') }}<span>Others</span></a>
+        </ul>
+      </div>
+    </section>
+    <section class="!flex-none p-4">
+      <div class="flex items-center gap-3 h-min">
+        <img class="size-10 shrink-0 object-cover rounded-full" alt="@lucasma8795"
+          src="https://github.com/lucasma8795.png">
+        <div class="grid text-sm">
+          <div>Logged in as <span class="font-semibold">khm39</span></div>
+          <a href="#" class="text-sm text-gray-500 hover:underline hover:cursor-pointer">Log out</a>
+        </div>
+      </div>
+    </section>
+  </nav>
+</aside>
+
+<main>
+  <div class="container mx-auto p-8">
+    {% block content %}{% endblock %}
+    <footer class="mt-10">
+      <hr class="my-6 w-full" />
+      <span class="text-sm text-gray-500">
+        © 2025 <a href="https://kcsu.org.uk/" class="hover:underline">King's College Student Union</a>.
+        All rights reserved.
+      </span>
+  </div>
+  </footer>
+  </div>
+</main>
+
+</html>
