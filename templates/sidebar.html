@@ -1,19 +1,7 @@
 {% from 'icons.jinja' import category_icon %}
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en" class="dark">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Library of Things - KCSU</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/basecoat.cdn.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
-</head>
-
+{% block preamble %}
 <aside class="sidebar" data-side="left" aria-hidden="false">
   <nav aria-label="Sidebar navigation">
     <header>
@@ -29,7 +17,7 @@
       </a>
     </header>
     <section class="scrollbar">
-      <div role="group" aria-labelledby="group-label-content-1">
+      <div role="group">
         <h3>Categories</h3>
         <ul>
           <li>
@@ -46,34 +34,53 @@
           </li>
           <li>
             <a href="javascript:void(0)">{{ category_icon('others') }}<span>Others</span></a>
+          </li>
         </ul>
       </div>
+      {# Admin dashboard section -- TODO(lucas): properly implement #}
+      {% if user.email == "khm39@cam.ac.uk"%}
+      <div role="group">
+        <h3>Administrator</h3>
+        <ul>
+          <li>
+            <a href="javascript:void(0)">
+              <span class="icon" data-icon="edit"></span>
+              <span>Manage Inventory</span>
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">
+              <span class="icon" data-icon="shield"></span>
+              <span>Permissions</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
     </section>
     <section class="!flex-none p-4">
       <div class="flex items-center gap-3 h-min">
         <img class="size-10 shrink-0 object-cover rounded-full" alt="@lucasma8795"
           src="https://github.com/lucasma8795.png">
         <div class="grid text-sm">
-          <div>Logged in as <span class="font-semibold">khm39</span></div>
-          <a href="#" class="text-sm text-gray-500 hover:underline hover:cursor-pointer">Log out</a>
+          <div>Logged in as <span class="font-semibold">{{ user.email | replace('@cam.ac.uk', '') }}</span></div>
+          <a href="/logout" class="text-sm text-gray-500 hover:underline hover:cursor-pointer">Log out</a>
         </div>
       </div>
     </section>
   </nav>
 </aside>
+{% endblock %}
 
-<main>
-  <div class="container mx-auto p-8">
-    {% block content %}{% endblock %}
-    <footer class="mt-10">
-      <hr class="my-6 w-full" />
-      <span class="text-sm text-gray-500">
-        © 2025 <a href="https://kcsu.org.uk/" class="hover:underline">King's College Student Union</a>.
-        All rights reserved.
-      </span>
-  </div>
+{% block main %}
+<div class="container mx-auto p-8">
+  {% block content %}{% endblock %}
+  <footer class="mt-10">
+    <hr class="my-6 w-full" />
+    <span class="text-sm text-gray-500">
+      © 2025 <a href="https://kcsu.org.uk/" class="hover:underline">King's College Student Union</a>.
+      All rights reserved.
+    </span>
   </footer>
-  </div>
-</main>
-
-</html>
+</div>
+{% endblock %}

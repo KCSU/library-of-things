@@ -45,3 +45,13 @@
   user-drag: none;
   transition: transform 0.2s ease;
 }
+
+span.icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.sidebar span.icon {
+  width: 16px;
+  height: 16px;
+}

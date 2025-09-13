@@ -37,17 +37,22 @@ function initLightbox() {
     }
   });
 
-  function attachImageListeners() {
-    $('.card img').off('click.lightbox').on('click.lightbox', function () {
-      openLightbox(this.src, this.alt);
-    });
-  }
-
-  attachImageListeners();
+  // Attach image listeners
+  $('.card img').off('click.lightbox').on('click.lightbox', function () {
+    openLightbox(this.src, this.alt);
+  });
 
   $(document).on('click', '.card img', function () {
     openLightbox(this.src, this.alt);
   });
 }
 
-$(document).ready(initLightbox);
+$(document).ready(() => {
+  initLightbox();
+
+  // lazy icon loading
+  $('span.icon').each((_, el) => {
+    const iconName = $(el).data('icon');
+    $(el).load("/static/icons/" + iconName + ".svg");
+  });
+});
