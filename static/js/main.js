@@ -1,7 +1,7 @@
 function initLightbox() {
   const lightboxHTML = `
-    <div id="lightbox-overlay" class="lightbox-overlay">
-      <div class="lightbox-content">
+    <div id="lightbox-overlay" class="lightbox-overlay cursor-pointer">
+      <div class="lightbox-content cursor-default">
         <img id="lightbox-image" class="lightbox-image" src="" alt="">
       </div>
     </div>
@@ -56,3 +56,20 @@ $(document).ready(() => {
     $(el).load("/static/icons/" + iconName + ".svg");
   });
 });
+
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    console.log('User signed out.');
+  });
+}
+
+function dismissOverlay() {
+  const overlay = $('.overlay');
+  overlay.removeClass('opacity-100').addClass('opacity-0');
+  setTimeout(() => {
+    overlay.addClass('hidden');
+  }, 300); // Match transition duration
+
+  $('body').css('overflow', ''); // Re-enable background scrolling
+}

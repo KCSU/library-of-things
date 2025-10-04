@@ -1,4 +1,3 @@
-{% from 'icons.jinja' import category_icon %}
 {% extends "base.html" %}
 
 {% block preamble %}
@@ -14,6 +13,17 @@
           <span class="truncate font-medium">Library of Things</span>
           <span class="truncate text-xs">v0.1.0</span>
         </div>
+        {# <button
+          type="button"
+          aria-label="Toggle dark mode"
+          data-tooltip="Toggle dark mode"
+          data-side="bottom"
+          onclick="document.dispatchEvent(new CustomEvent('basecoat:theme'))"
+          class="btn-icon-outline size-8"
+        >
+          <span class="hidden dark:block"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></svg></span>
+          <span class="block dark:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg></span>
+        </button> #}
       </a>
     </header>
     <section class="scrollbar">
@@ -21,37 +31,64 @@
         <h3>Categories</h3>
         <ul>
           <li>
-            <a href="javascript:void(0)">{{ category_icon('clothing') }}<span>Clothing</span></a>
+            <a href="javascript:void(0)">
+              <span class="icon" data-icon="clothing"></span>
+              <span>Clothing</span>
+            </a>
           </li>
           <li>
-            <a href="javascript:void(0)">{{ category_icon('kitchenware') }}<span>Kitchenware</span></a>
+            <a href="javascript:void(0)">
+              <span class="icon" data-icon="kitchenware"></span>
+              <span>Kitchenware</span>
+            </a>
           </li>
           <li>
-            <a href="javascript:void(0)">{{ category_icon('sports') }}<span>Sports</span></a>
+            <a href="javascript:void(0)">
+              <span class="icon" data-icon="sports"></span>
+              <span>Sports</span>
+            </a>
           </li>
           <li>
-            <a href="javascript:void(0)">{{ category_icon('electronics') }}<span>Electronics</span></a>
+            <a href="javascript:void(0)">
+              <span class="icon" data-icon="electronics"></span>
+              <span>Electronics</span>
+            </a>
           </li>
           <li>
-            <a href="javascript:void(0)">{{ category_icon('others') }}<span>Others</span></a>
+            <a href="javascript:void(0)">
+              <span class="icon" data-icon="others"></span>
+              <span>Others</span>
+            </a>
           </li>
         </ul>
       </div>
-      {# Admin dashboard section -- TODO(lucas): properly implement #}
-      {% if user.email == "khm39@cam.ac.uk"%}
+      {% if user.is_admin %}
       <div role="group">
         <h3>Administrator</h3>
         <ul>
           <li>
-            <a href="javascript:void(0)">
+            <a href="/admin/requests">
+              <span class="icon" data-icon="request-add"></span>
+              <span>Item Requests</span>
+              {# <span style="background-color: #ff3f2d" class="ml-auto inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white rounded-full">3</span> #}
+            </a>
+          </li>
+          <li>
+            <a href="/admin/inventory">
               <span class="icon" data-icon="edit"></span>
               <span>Manage Inventory</span>
             </a>
           </li>
           <li>
-            <a href="javascript:void(0)">
+            <a href="/admin/list">
               <span class="icon" data-icon="shield"></span>
               <span>Permissions</span>
+            </a>
+          </li>
+          <li>
+            <a href="/admin/directory">
+              <span class="icon" data-icon="directory"></span>
+              <span>Manage Users</span>
             </a>
           </li>
         </ul>
@@ -60,11 +97,11 @@
     </section>
     <section class="!flex-none p-4">
       <div class="flex items-center gap-3 h-min">
-        <img class="size-10 shrink-0 object-cover rounded-full" alt="@lucasma8795"
-          src="https://github.com/lucasma8795.png">
+        <img class="size-10 shrink-0 object-cover rounded-full" alt="{{ user.name }}" src="{{ user.picture }}">
         <div class="grid text-sm">
           <div>Logged in as <span class="font-semibold">{{ user.email | replace('@cam.ac.uk', '') }}</span></div>
-          <a href="/logout" class="text-sm text-gray-500 hover:underline hover:cursor-pointer">Log out</a>
+          <a onclick="signOut()" href="/logout" class="text-sm text-gray-500 hover:underline hover:cursor-pointer">Log
+            out</a>
         </div>
       </div>
     </section>

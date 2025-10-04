@@ -1,0 +1,36 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="container mx-auto px-16 py-4">
+  <table class="table w-full">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item Name</th>
+        <th>Location</th>
+        <th>Requested by</th>
+        <th>Time of request</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    {% for item in items %}
+    <tbody>
+      <tr>
+        <td class="font-medium">{{ item.display_id }}</td>
+        <td class="text-ellipsis overflow-hidden">{{ item.title }}</td>
+        <td class="text-ellipsis overflow-hidden">{{ item.location }}</td>
+        <td><a class="hover:underline text-blue-500" href="mailto:{{ item.requested_by }}@cam.ac.uk">{{ item.requested_by }}@cam.ac.uk</a> ({{ item.requested_by_name }})</td>
+        <td class="text-ellipsis overflow-hidden">{{ item.request_time.strftime("%d/%m/%Y %H:%M") }}</td>
+        <td>
+          <button onclick="deliverItem('{{ item.id }}', '{{ item.requested_by }}@cam.ac.uk')" class="btn btn-secondary text-sm h-[2.25em] mr-1">Confirm Delivery</button>
+          <button onclick="refuseRequest('{{ item.id }}')" class="btn btn-destructive text-sm h-[2.25em] mr-1">Refuse Request</button>
+        </td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table>
+</div>
+
+<script src="{{ url_for('static', filename='js/requests.js') }}"></script>
+
+{% endblock %}

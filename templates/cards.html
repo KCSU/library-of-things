@@ -1,5 +1,3 @@
-{% from 'icons.jinja' import category_icon %}
-
 {% for item in items %}
 <div class="card">
   <header>
@@ -7,34 +5,36 @@
     <p>{{ item.description }}</p>
   </header>
   <section class="px-0">
-    <img loading="lazy" width="500" height="500" class="aspect-video object-cover hover:cursor-pointer"
+    <img loading="lazy" class="aspect-video object-cover hover:cursor-pointer w-full"
       style="color:transparent" src="{{ item.image_url }}" alt="{{ item.title }}: {{ item.description }}"
       title="Click to expand image" />
   </section>
   <footer class="flex items-center gap-2">
+    {% if item.borrow_length == "long" %}
     <span class="badge-outline">
-      {% if item.borrow_type == "long_term" %}
       <span class="icon" data-icon="clock-7"></span>
       Long Loan
-      {% elif item.borrow_type == "short_term" %}
+    </span>
+    {% elif item.borrow_length == "short" %}
+    <span class="badge-outline" {# data-tooltip="asdasdasdasdaaa" data-side="top" data-align="center" #}>
       <span class="icon" data-icon="clock-2"></span>
       Short Loan
-      {% elif item.borrow_type == "permanent" %}
+    </span>
+    {% elif item.borrow_length == "permanent" %}
+    <span class="badge-outline" {# data-tooltip="123123123123123" data-side="top" data-align="center" #}>
       <span class="icon" data-icon="infinity"></span>
       Permanent
-      {% endif %}
     </span>
+    {% endif %}
     <span class="badge-outline">
-      {{ category_icon(item.category) }}
+      <span class="icon" data-icon="{{ item.category }}"></span>
       {{ item.category | capitalize }}
     </span>
-    <button class="btn ml-auto font-medium">
-      {% if item.borrow_type == "permanent" %}
-      Take
-      {% else %}
-      Borrow
-      {% endif %}
-    </button>
+    {% if item.borrow_length == "permanent" %}
+    <button onclick="showConfirmOverlay('{{ item.title | escape }}', '{{ item.borrow_length }}', '{{ item.id }}')" class="btn ml-auto font-medium">Take</button>
+    {% else %}
+    <button onclick="showConfirmOverlay('{{ item.title | escape }}', '{{ item.borrow_length }}', '{{ item.id }}')" class="btn ml-auto font-medium">Borrow</button>
+    {% endif %}
   </footer>
 </div>
 {% endfor %}

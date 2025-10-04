@@ -1,0 +1,89 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="container mx-auto px-16 py-4">
+  {# <button class="btn-link p-0" onclick="window.location.href='/'">&larr; Back to Home</button> #}
+
+  <table class="table table-fixed w-full" id="users-table">
+    <thead>
+      <tr>
+        <th class="w-8 font-semibold">CRSid</th>
+        <th class="w-32 font-semibold">Display Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr class="user-row">
+        <td class="font-medium">{{ user.crsid }}</td>
+        <td>{{ user.name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <!-- Pagination Controls -->
+  <div class="flex justify-between items-center mt-4 text-sm">
+    <div class="text-gray-600">
+      Showing <span id="start-item">1</span> to <span id="end-item">50</span> of <span id="total-items">{{ users|length }}</span> users
+    </div>
+    <div class="flex gap-2 items-center">
+      <button id="prev-btn" class="btn btn-secondary" onclick="changePage(-1)" disabled>Previous</button>
+      <span id="page-info" class="px-3">Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
+      <button id="next-btn" class="btn btn-secondary" onclick="changePage(1)">Next</button>
+    </div>
+  </div>
+
+  <div class="text-gray-600 text-sm mt-2">
+    If you wish to modify this list, please contact <a href="mailto:computing@kcsu.org.uk" class="hover:underline">computing@kcsu.org.uk</a> for now!
+  </div>
+</div>
+
+<script>
+const ITEMS_PER_PAGE = 10;
+let currentPage = 1;
+let totalPages = 1;
+
+function initPagination() {
+  const $rows = $('.user-row');
+  const totalItems = $rows.length;
+  totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  
+  $('#total-items').text(totalItems);
+  $('#total-pages').text(totalPages);
+  
+  showPage(1);
+}
+
+function showPage(page) {
+  const $rows = $('.user-row');
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  
+  // Hide all rows and show current page rows
+  $rows.hide().slice(startIndex, endIndex).show();
+  
+  // Update pagination info
+  const actualEndIndex = Math.min(endIndex, $rows.length);
+  $('#start-item').text($rows.length > 0 ? startIndex + 1 : 0);
+  $('#end-item').text(actualEndIndex);
+  $('#current-page').text(page);
+  
+  // Update button states
+  $('#prev-btn').prop('disabled', page === 1);
+  $('#next-btn').prop('disabled', page === totalPages);
+  
+  currentPage = page;
+}
+
+function changePage(direction) {
+  const newPage = currentPage + direction;
+  if (newPage >= 1 && newPage <= totalPages) {
+    showPage(newPage);
+  }
+}
+
+// Initialize pagination when page loads
+$(document).ready(initPagination);
+</script>
+
+{% endblock %}
