@@ -1,0 +1,137 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<main class="px-32 py-6">
+  <header class="mb-10">
+    <h1 class="text-3xl font-semibold tracking-tight mb-2">Site Manual</h1>
+    <p class="text-[1.05rem] text-gray-300">Everything that you (hopefully!) need to know to manage the Library of Things website.</p>
+  </header>
+
+  <article class="mb-10">
+    <a class="mb-3 block" id="getting-started" href="#getting-started">
+      <span class="text-2xl font-semibold text-gray-400 mr-2">0</span>
+      <span class="text-2xl font-semibold tracking-tight">Getting Started</span>
+    </a>
+    <section class="prose text-[15px]">
+      <p class="mb-3">
+        Since you are able to see this page, you must already be an
+        administrator and should have access to the admin sidebar on the left.
+        To assign administrator privileges to other users, please contact
+        the computing officer (for now).
+      </p>
+      <p class="mb-3">
+        Under "Item Requests", you will see all pending requests from users to
+        borrow items. You can either confirm item delivery (which will start the
+        item's loan with the borrower) or refuse borrow requests.
+      </p>
+      <p class="mb-3">
+        Under "Manage Inventory", you will see a list of all items. You can
+        add new items, and also delete and edit existing items. Notably, you can also
+        hide items, which makes them invisible to regular users but still visible in the
+        admin inventory.
+      </p>
+      <p class="mb-3">
+        For each item, you can choose from a pre-determined set of loan durations
+        (7 days / 30 days / end of academic year / permanent). This determines how long an
+        item can be borrowed for. "End of academic year" here means the next
+        30th June, while "permanent" here means the item will be given away,
+        permanently.
+      </p>
+      <p class="mb-3">
+        You can also put out public announcements that will be displayed on the
+        homepage for all users to see. You can do this in the "Announcements" section.
+      </p>
+    </section>
+  </article>
+
+  <article class="mb-10">
+    <a class="mb-3 block" id="user-access" href="#user-access">
+      <span class="text-2xl font-semibold text-gray-400 mr-2">1</span>
+      <span class="text-2xl font-semibold tracking-tight">&lt;user&gt; doesn't have access to the Library!</span>
+    </a>
+    <section class="prose text-[15px]">
+      <p class="mb-3">
+        This most likely means that they are not registered as a user on the website.
+        Internally, the system keeps track of a list of authorized users (King's undergraduates
+        and postgraduates) who are allowed to access the Library. Please contact
+        Lucas to have them added, while he looks for a better solution.
+      </p>
+    </section>
+  </article>
+
+  <article class="mb-10">
+    <a class="mb-3 block" id="user-abuse" href="#user-abuse">
+      <span class="text-2xl font-semibold text-gray-400 mr-2">2</span>
+      <span class="text-2xl font-semibold tracking-tight">&lt;user&gt; is abusing the platform!</span>
+    </a>
+    <section class="prose text-[15px]">
+      <p class="mb-3">
+        There is currently no automated way to deal with this. Either
+        manually refuse their requests each time, or contact Lucas
+        to have their account removed from the system.
+      </p>
+    </section>
+  </article>
+
+  <article class="mb-10">
+    <a class="mb-3 block" id="upload-image" href="#upload-image">
+      <span class="text-2xl font-semibold text-gray-400 mr-2">3</span>
+      <span class="text-2xl font-semibold tracking-tight">How do I upload &lt;image&gt;?</span>
+    </a>
+    <section class="prose text-[15px]">
+      <p class="mb-3">
+        You should have edit access to
+        <a href="https://drive.google.com/drive/folders/19IOF5MHK3oEjMFQ2g21j_TpWypD8aPyZ" class="hover:underline text-blue-500">this Google Drive folder</a>.
+        If not, please obtain access from the computing officer.
+      </p>
+      <p class="mb-3">
+        Upload the image to the folder, right-click on it, and select "Copy Link".
+        The image should be publicly viewable. The link should be of the form
+      </p>
+      <pre class="text-center my-6 text-sm">https://drive.google.com/file/d/<b class="text-red-400">&lt;image_id&gt;</b>/view?...</pre>
+      <p class="mb-3">Copy the image ID, then paste it inside the following URL template:</p>
+      <pre class="text-center my-6 text-sm">https://lh3.googleusercontent.com/d/<b class="text-red-400">&lt;image_id&gt;</b>/view</pre>
+      <p class="mb-3">You can then use this URL as the image URL when adding or editing items in the inventory.</p>
+      <p class="mb-3">This is a temporary solution. If this proves to be too much of a hassle, Lucas is open to suggestions for improvement.</p>
+    </section>
+  </article>
+
+  <article class="mb-10">
+    <a class="mb-3 block" id="website-broken" href="#website-broken">
+      <span class="text-2xl font-semibold text-gray-400 mr-2">4</span>
+      <span class="text-2xl font-semibold tracking-tight">&lt;feature&gt; isn't working!</span>
+    </a>
+    <section class="prose text-[15px]">
+      <p class="mb-3">If you are not the computing officer, please
+        <a href="computing@kcsu.org.uk" class="hover:underline text-blue-500">contact them</a>
+        for assistance.
+      </p>
+      <p class="mb-3">If you are the computing officer, you can find documentation for the website here.</p>
+      <p class="mb-3">
+        If everything is on 🔥 and needs to be fixed urgently, you can
+        <a href="mailto:lucasma09202@gmail.com" class="hover:underline text-blue-500">
+          contact the original developer
+        </a> (Lucas Ma, Computing Officer 2025-26). He will be more than happy to help.
+      </p>
+    </section>
+  </article>
+
+  <article class="mb-10">
+    <a class="mb-3 block" id="new-feature" href="#new-feature">
+      <span class="text-2xl font-semibold text-gray-400 mr-2">5</span>
+      <span class="text-2xl font-semibold tracking-tight">I wish we had &lt;feature&gt;!</span>
+    </a>
+    <section class="prose text-[15px]">
+      <p class="mb-3">
+        Feature requests are always welcome! For now, please contact Lucas
+        (while he is still the computing officer) to discuss your ideas.
+      </p>
+    </section>
+  </article>
+
+  <footer class="mt-10">
+    <p class="text-sm text-gray-500">Last updated: 2025-10-21 (Lucas Ma)</p>
+  </footer>
+</main>
+
+{% endblock %}

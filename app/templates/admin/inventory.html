@@ -1,0 +1,174 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="fixed top-0 left-0 w-full h-full z-[99] bg-black/30 backdrop-blur-sm cursor-pointer transition-opacity duration-300 overlay hidden opacity-0" id="confirm-overlay" onclick="dismissOverlay()">
+  <div class="flex items-center justify-center h-full w-full">
+    <div class="card w-2/5 mb-5 border-[oklch(1 0 0/25%)] border-[1px] cursor-default max-h-5/6 overflow-scroll" onclick="event.stopPropagation()">
+      <header class="edit-item-contents">
+        <h2>Edit Item</h2>
+        <p>Edit the details of the selected item.</p>
+      </header>
+
+      <header class="add-item-contents">
+        <h2>Add New Item</h2>
+        <p>Enter the details of the new item.</p>
+      </header>
+
+      <section class="text-sm">
+        <form class="form grid gap-6" id="edit-form">
+          <div class="grid gap-2">
+            <label for="item-id">Item ID *</label>
+            <input type="text" id="item-id" placeholder="42" required>
+          </div>
+
+          <div class="grid gap-2">
+            <label for="item-name">Item Name *</label>
+            <input type="text" id="item-name" placeholder="Item name" required>
+          </div>
+
+          <div class="grid gap-2">
+            <label for="item-description">Item Description *</label>
+            <textarea id="item-description" placeholder="Description" rows="3" required></textarea>
+          </div>
+
+          <div class="grid gap-2">
+            <label for="item-image">Image URL *</label>
+            <input type="url" id="item-image" placeholder="https://example.com/image.jpg" required>
+          </div>
+
+          <div class="grid gap-2">
+            <label for="item-category">Item Category *</label>
+            <select id="item-category" required>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}">{{ cat.category }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="grid gap-2">
+            <label for="item-loan-policy">Loan Policy *</label>
+            <select id="item-loan-policy" required>
+              <option value="seven_days">Short (7 days)</option>
+              <option value="thirty_days">Medium (30 days)</option>
+              <option value="academic_year_end">Long (End of academic year)</option>
+              <option value="permanent">Permanent</option>
+            </select>
+          </div>
+
+          <div class="grid gap-2">
+            <label for="item-count">Item Count *</label>
+            <input type="number" id="item-count" placeholder="1" min="0" value="1" required>
+          </div>
+
+          <div class="grid gap-2">
+            <label for="item-location">Location</label>
+            <input type="text" id="item-location" placeholder="Item location...">
+          </div>
+
+          <div class="grid gap-2">
+            <label for="item-comments">Internal Notes</label>
+            <textarea id="item-comments" placeholder="Optional comments on this item..." rows="3"></textarea>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="item-visible" checked>
+            <label for="item-visible">Publicly visible</label>
+          </div>
+
+          <div class="flex justify-between">
+            <button type="button" onclick="dismissOverlay()" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn">Confirm</button>
+          </div>
+        </form>
+      </section>
+
+      {#<hr class="loan-item-section"/>
+
+      <header class="loan-item-section">
+        <h2>Loan Item</h2>
+        <p>Manually loan the selected item to a student. This would normally be done automatically after the item is marked as delivered.</p>
+      </header>#}
+      
+      {#<section class="text-sm loan-item-section">
+        <form class="form grid gap-2" id="loan-form">
+          <div class="flex gap-4 ">
+            <input type="email" id="loan-email" aria-invalid="true" placeholder="crsid@cam.ac.uk" class="flex-1">
+            <button type="submit" class="btn">Loan Item</button>
+          </div>
+          <span class="text-xs" style="color: oklch(.704 .191 22.216)">This CRSid is not registered as a user in the directory; did you enter the correct email?</span>
+        </form>
+      </section>#}
+
+      <hr class="delete-item-contents" />
+
+      <header class="delete-item-contents">
+        <h2>Delete Item</h2>
+        <p>
+          Remove the selected item from the inventory. This action is irreversible!
+        </p>
+      </header>
+
+      <section class="text-sm delete-item-contents">
+        <button class="btn btn-destructive" onclick="deleteItem()">Delete Item</button>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="container mx-auto px-16 py-4">
+  <header class="mb-10">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">Manage Inventory</h2>
+    <p class="text-[1.05rem] text-gray-300">All items in the inventory are listed here. Add, edit or delete items as needed.</p>
+  </header>
+  <table class="table w-full">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Image</th>
+        <th>Category</th>
+        <th>Count</th>
+        <th>Loan Policy</th>
+        <th>Visible</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    {% for item in items %}
+    <tbody>
+      <tr>
+        <td class="font-medium">{{ item.display_id }}</td>
+        <td class="text-ellipsis overflow-hidden">{{ item.title }}</td>
+        {% if item.location %}
+        <td class="text-ellipsis overflow-hidden">{{ item.location }}</td>
+        {% else %}
+        <td class="text-ellipsis overflow-hidden text-gray-500">(unknown)</td>
+        {% endif %}
+        <td><a class="hover:underline text-blue-500" target="_blank" href="{{ item.image_url }}">Link</a></td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.count }}</td>
+        <td>
+          {% if item.loan_policy == "seven_days" %}
+          Short (7d)
+          {% elif item.loan_policy == "thirty_days" %}
+          Medium (30d)
+          {% elif item.loan_policy == "academic_year_end" %}
+          Long (Year End)
+          {% elif item.loan_policy == "permanent" %}
+          Permanent
+          {% endif %}
+        </td>
+        <td>{% if item.visible %}Yes{% else %}No{% endif %}</td>
+        <td>
+          <button onclick='showOverlay({{ item | tojson | safe }})' class="btn btn-secondary text-sm h-[2.25em] mr-1">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table>
+  <button onclick="showOverlay({})" class="btn btn-secondary mt-2">Add New Item</button>
+</div>
+
+<script src="{{ url_for('static', filename='js/inventory.js') }}"></script>
+
+{% endblock %}

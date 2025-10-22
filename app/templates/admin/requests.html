@@ -1,0 +1,52 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="container mx-auto px-16 py-4">
+  <header class="mb-10">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">Item Requests</h2>
+    <p class="text-[1.05rem] text-gray-300">Requested items will show up here. After you deliver the item, please mark it down here.</p>
+  </header>
+  <table class="table w-full">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Image</th>
+        <th>Location</th>
+        <th>Requested by</th>
+        <th>Pigeonhole</th>
+        <th>Time of request</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    {% for req in requests %}
+    <tbody>
+      <tr>
+        <td class="font-medium">{{ req.id }}</td>
+        <td class="text-ellipsis overflow-hidden">{{ req.item_title }}</td>
+        <td class="text-ellipsis overflow-hidden"><a href="{{ req.item_image_url }}" class="text-blue-500 hover:underline" target="_blank">Link</a></td>
+        {% if req.item_location %}
+        <td class="text-ellipsis overflow-hidden">{{ req.item_location }}</td>
+        {% else %}
+        <td class="text-ellipsis overflow-hidden text-gray-500">(unknown)</td>
+        {% endif %}
+        <td>{{ req.borrower_name }} (<a class="hover:underline text-blue-500" href="mailto:{{ req.borrower_crsid }}@cam.ac.uk">{{ req.borrower_crsid }}</a>)</td>
+        {% if req.borrower_pigeonhole %}
+        <td class="text-ellipsis overflow-hidden">{{ req.borrower_pigeonhole }}</td>
+        {% else %}
+        <td class="text-ellipsis overflow-hidden text-gray-500">(unknown)</td>
+        {% endif %}
+        <td class="text-ellipsis overflow-hidden">{{ req.request_time }}</td>
+        <td>
+          <button onclick="deliverItem({{ req.id }}, {{ req.item_id }}, '{{ req.borrower_crsid }}@cam.ac.uk')" class="btn btn-secondary text-sm h-[2.25em] mr-1">Confirm Delivery</button>
+          <button onclick="refuseRequest({{ req.id }})" class="btn btn-destructive text-sm h-[2.25em] mr-1">Refuse</button>
+        </td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table>
+</div>
+
+<script src="{{ url_for('static', filename='js/requests.js') }}"></script>
+
+{% endblock %}

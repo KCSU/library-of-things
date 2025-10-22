@@ -1,0 +1,50 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="container mx-auto px-16 py-4">
+  <header class="mb-10">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">Active Loans</h2>
+    <p class="text-[1.05rem] text-gray-300">Active loans will show up here. After they return the item, please mark it down here.</p>
+  </header>
+  <table class="table w-full">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item ID</th>
+        <th>Item Name</th>
+        <th>Image</th>
+        <th>Borrowed By</th>
+        <th>Due Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    {% for loan in loans %}
+    <tbody>
+      <tr>
+        <td class="font-medium">{{ loan.id }}</td>
+        <td class="text-ellipsis overflow-hidden">{{ loan.item_display_id }}</td>
+        <td class="text-ellipsis overflow-hidden">{{ loan.item_title }}</td>
+        <td><a class="hover:underline text-blue-500" target="_blank" href="{{ loan.item_image_url }}">Link</a></td>
+        <td>{{ loan.borrower_name }} (<a class="hover:underline text-blue-500" href="mailto:{{ loan.borrower_crsid }}@cam.ac.uk">{{ loan.borrower_crsid }}</a>)</td>
+        <td>
+          {% if loan.is_overdue %}
+          <div style="color: oklch(.704 .191 22.216)" data-tooltip="This item is overdue! Please contact the borrower.">
+            <span class="inline-block icon !w-[1rem]" data-icon="warning"></span>
+            {{ loan.due_date }}
+          </div>
+          {% else %}
+          {{ loan.due_date }}
+          {% endif %}
+        </td>
+        <td>
+          <button onclick='returnItem({{ loan | tojson | safe }})' class="btn btn-secondary text-sm h-[2.25em] mr-1">Return Item</button>
+        </td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table>
+</div>
+
+<script src="{{ url_for('static', filename='js/loans.js') }}"></script>
+
+{% endblock %}
