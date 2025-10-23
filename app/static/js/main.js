@@ -55,13 +55,24 @@ $(document).ready(() => {
     const iconName = $(el).data('icon');
     $(el).load("/static/icons/" + iconName + ".svg");
   });
+
+  // auto-collapse sidebar on mobile (< md breakpoint: 768px)
+  function handleSidebarResize() {
+    const $sidebar = $('.sidebar');
+    if (window.innerWidth < 768) {
+      $sidebar.attr('aria-hidden', 'true');
+    } else {
+      $sidebar.attr('aria-hidden', 'false');
+    }
+  }
+
+  handleSidebarResize();
+  $(window).on('resize', handleSidebarResize);
 });
 
 function signOut() {
   var auth2 = gapi.auth2.getAuthInstance();
-  auth2.signOut().then(function () {
-    console.log('User signed out.');
-  });
+  auth2.signOut();
 }
 
 function dismissOverlay() {

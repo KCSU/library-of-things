@@ -5,9 +5,9 @@
 </header>
 {% endif %}
 
-<div class="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+<div class="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 xl:mx-8">
   {% for item in items %}
-  <div class="card">
+  <div class="card min-w-0">
     <header>
       <h2>{{ item.title }}</h2>
       <p>{{ item.description }}</p>
@@ -18,37 +18,36 @@
         style="color:transparent" src="{{ item.image_url }}" alt="{{ item.title }}: {{ item.description }}"
         title="Click to expand image" />
     </section>
-    <footer class="flex items-center gap-2">
-      <span class="badge-outline">
+    <footer class="flex items-center gap-2 flex-wrap min-w-0">
+      {#<span class="badge-outline py-1.5 px-2">
         <span class="icon" data-icon="category/{{ item.category.lower() }}"></span>
         {{ item.category | capitalize }}
-      </span>
+      </span>#}
       {% if item.loan_policy == "seven_days" %}
-      <span class="badge-outline">
+      <span class="badge-outline py-1.5 px-2">
         <span class="icon" data-icon="clock-2"></span>
         7 days
       </span>
       {% elif item.loan_policy == "thirty_days" %}
-      <span class="badge-outline">
+      <span class="badge-outline py-1.5 px-2">
         <span class="icon" data-icon="clock-7"></span>
         30 days
       </span>
       {% elif item.loan_policy == "academic_year_end" %}
-      <span class="badge-outline">
+      <span class="badge-outline py-1.5 px-2">
         <span class="icon" data-icon="clock-10"></span>
         Year End
       </span>
       {% elif item.loan_policy == "permanent" %}
-      <span class="badge-outline">
+      <span class="badge-outline py-1.5 px-2">
         <span class="icon" data-icon="infinity"></span>
         Permanent
       </span>
       {% endif %}
-      {#{% if item.count > 1 %}
-      <span class="badge-outline" data-tooltip="{{ item.available_count }} of {{ item.count }} available">
-        {{ item.available_count }}/{{ item.count }}
+      <span class="badge-outline py-1.5 px-2" data-tooltip="{{ item.available_count }} of {{ item.count }} available">
+        <span class="icon" data-icon="hashtag"></span>
+        {{ item.available_count }} / {{ item.count }} left
       </span>
-      {% endif %}#}
       {% if read_only %}
       <span class="ml-auto" style="cursor: not-allowed;">
         <button class="btn font-medium" style="pointer-events: none" disabled>Disabled</button>

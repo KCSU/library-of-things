@@ -28,7 +28,7 @@
 </div>
 
 {% if announcement.enabled %}
-<div id="announcement-banner" class="sticky top-4 z-50 mb-6 w-full bg-[#332701] text-[#ffda6a] border-[#997404] border rounded-xl drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+<div id="announcement-banner" class="sticky top-4 z-50 mb-6 xl:mx-8 bg-[#332701] text-[#ffda6a] border-[#997404] border rounded-xl drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
   <div class="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
     <div class="flex items-center gap-3 flex-1">
       <svg class="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -63,7 +63,7 @@ function dismissAnnouncement() {
 </script>
 
 <div id="cards-container">
-  <div class="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" >
+  <div class="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 xl:mx-8">
     {# TODO(lucas): possibly fade in to reduce SSR flicker? #}
     {% for _ in range(5) %}
     <div class="card">

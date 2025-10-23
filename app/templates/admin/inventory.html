@@ -115,57 +115,59 @@
   </div>
 </div>
 
-<div class="container mx-auto px-16 py-4">
+<div class="container mx-auto p-2 md:px-6 lg:px-16">
   <header class="mb-10">
     <h2 class="text-2xl font-semibold tracking-tight mb-2">Manage Inventory</h2>
     <p class="text-[1.05rem] text-gray-300">All items in the inventory are listed here. Add, edit or delete items as needed.</p>
   </header>
-  <table class="table w-full">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Location</th>
-        <th>Image</th>
-        <th>Category</th>
-        <th>Count</th>
-        <th>Loan Policy</th>
-        <th>Visible</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    {% for item in items %}
-    <tbody>
-      <tr>
-        <td class="font-medium">{{ item.display_id }}</td>
-        <td class="text-ellipsis overflow-hidden">{{ item.title }}</td>
-        {% if item.location %}
-        <td class="text-ellipsis overflow-hidden">{{ item.location }}</td>
-        {% else %}
-        <td class="text-ellipsis overflow-hidden text-gray-500">(unknown)</td>
-        {% endif %}
-        <td><a class="hover:underline text-blue-500" target="_blank" href="{{ item.image_url }}">Link</a></td>
-        <td>{{ item.category }}</td>
-        <td>{{ item.count }}</td>
-        <td>
-          {% if item.loan_policy == "seven_days" %}
-          Short (7d)
-          {% elif item.loan_policy == "thirty_days" %}
-          Medium (30d)
-          {% elif item.loan_policy == "academic_year_end" %}
-          Long (Year End)
-          {% elif item.loan_policy == "permanent" %}
-          Permanent
+  <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Location</th>
+          <th>Image</th>
+          <th>Category</th>
+          <th>Count</th>
+          <th>Loan Policy</th>
+          <th>Visible</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      {% for item in items %}
+      <tbody>
+        <tr>
+          <td class="font-medium">{{ item.display_id }}</td>
+          <td class="text-ellipsis overflow-hidden">{{ item.title }}</td>
+          {% if item.location %}
+          <td class="text-ellipsis overflow-hidden">{{ item.location }}</td>
+          {% else %}
+          <td class="text-ellipsis overflow-hidden text-gray-500">(unknown)</td>
           {% endif %}
-        </td>
-        <td>{% if item.visible %}Yes{% else %}No{% endif %}</td>
-        <td>
-          <button onclick='showOverlay({{ item | tojson | safe }})' class="btn btn-secondary text-sm h-[2.25em] mr-1">Edit</button>
-        </td>
-      </tr>
-    </tbody>
-    {% endfor %}
-  </table>
+          <td><a class="hover:underline text-blue-500" target="_blank" href="{{ item.image_url }}">Link</a></td>
+          <td>{{ item.category }}</td>
+          <td>{{ item.count }}</td>
+          <td>
+            {% if item.loan_policy == "seven_days" %}
+            Short (7d)
+            {% elif item.loan_policy == "thirty_days" %}
+            Medium (30d)
+            {% elif item.loan_policy == "academic_year_end" %}
+            Long (Year End)
+            {% elif item.loan_policy == "permanent" %}
+            Permanent
+            {% endif %}
+          </td>
+          <td>{% if item.visible %}Yes{% else %}No{% endif %}</td>
+          <td>
+            <button onclick='showOverlay({{ item | tojson | safe }})' class="btn btn-secondary text-sm h-[2.25em] mr-1">Edit</button>
+          </td>
+        </tr>
+      </tbody>
+      {% endfor %}
+    </table>
+  </div>
   <button onclick="showOverlay({})" class="btn btn-secondary mt-2">Add New Item</button>
 </div>
 
