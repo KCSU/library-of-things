@@ -2,6 +2,7 @@ from app.config import config
 from app.utils.database import init_database
 from authlib.integrations.flask_client import OAuth
 from flask import Flask
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def create_app(config_name='development'):
@@ -10,6 +11,8 @@ def create_app(config_name='development'):
     # Load configuration
     app.config.from_object(config[config_name])
     config_obj = config[config_name]()
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
     
     # Initialize database
     try:
@@ -67,14 +70,12 @@ def register_context_processors(app):
 def register_blueprints(app):
     """Register Flask blueprints"""
     from app.routes.admin import admin_bp
-    from app.routes.api import api_bp
     from app.routes.auth import auth_bp
     from app.routes.items import items_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(items_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
-    app.register_blueprint(api_bp, url_prefix='/api')
 
 def register_error_handlers(app):
     """Register error handlers"""

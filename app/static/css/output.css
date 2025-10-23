@@ -217,6 +217,9 @@
   .visible {
     visibility: visible;
   }
+  .absolute {
+    position: absolute;
+  }
   .fixed {
     position: fixed;
   }
@@ -228,6 +231,9 @@
   }
   .left-0 {
     left: calc(var(--spacing) * 0);
+  }
+  .z-99 {
+    z-index: 99;
   }
   .z-\[99\] {
     z-index: 99;
@@ -333,6 +339,9 @@
   }
   .block {
     display: block;
+  }
+  .contents {
+    display: contents;
   }
   .flex {
     display: flex;
@@ -465,6 +474,9 @@
   .flex-1 {
     flex: 1;
   }
+  .flex-none\! {
+    flex: none !important;
+  }
   .shrink-0 {
     flex-shrink: 0;
   }
@@ -570,6 +582,9 @@
   }
   .bg-inherit {
     background-color: inherit;
+  }
+  .bg-inherit\! {
+    background-color: inherit !important;
   }
   .bg-red-100 {
     background-color: var(--color-red-100);

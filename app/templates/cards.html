@@ -12,7 +12,7 @@
   </section>
   <footer class="flex items-center gap-2">
     <span class="badge-outline">
-      <span class="icon" data-icon="category/{{ item.category }}"></span>
+      <span class="icon" data-icon="category/{{ item.category.lower() }}"></span>
       {{ item.category | capitalize }}
     </span>
     {% if item.loan_policy == "seven_days" %}

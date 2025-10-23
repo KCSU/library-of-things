@@ -215,9 +215,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Firestore
-service_account_key.json
-
 # Tools
 tools/
 
