@@ -58,7 +58,7 @@ def authorized():
             # User not authorized
             session.clear()
             return render_template('login.html', 
-                error='You are not authorized to access this system. If you are from King\'s College, Cambridge, and think you should have access, please contact the KCSU.'
+                error='You are not authorized to access this website. If you are from King\'s College, Cambridge, and believe you should have access, please contact the KCSU.'
             )
     
     return redirect(url_for('auth.login'))
