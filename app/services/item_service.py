@@ -1,8 +1,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import joinedload
 from app.utils.database import db_session
-from app.models.item import Item
-from app.models.category import Category
+from app.models import Item, Category
 
 class ItemService:
     """Service class for item operations"""

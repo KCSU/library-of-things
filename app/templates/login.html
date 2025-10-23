@@ -4,18 +4,25 @@
 <style>
   @font-face {
     font-family: Proxima-Nova;
-    src: url("{{ url_for('static', filename='fonts/Proxima-Nova-Bold.woff2') }}") format("woff2");
+    src: url("{{ url_for('static', filename='fonts/Proxima-Nova-Regular.woff2') }}") format("woff2");
+    font-weight: 400;
+    font-style: normal;
   }
-
+  @font-face {
+    font-family: Proxima-Nova;
+    src: url("{{ url_for('static', filename='fonts/Proxima-Nova-Bold.woff2') }}") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+  }
   * {
     font-family: Proxima-Nova, system-ui, sans-serif;
   }
 </style>
-{% if error %}
-<div class="fixed py-12 w-full flex justify-center">
-  <div class="alert-destructive max-w-fit">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
-    <section class="font-light">{{ error }}</section>
+{% if true %}
+<div class="fixed mt-24 md:mt-16 w-full flex justify-center px-12">
+  <div class="alert-destructive w-full max-w-md">
+    <svg class="translate-y-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
+    <section class="text-base">You are not authorized to access this website. If you are from King's College, Cambridge, and believe you should have access, please contact the KCSU.</section>
   </div>
 </div>
 {% endif %}

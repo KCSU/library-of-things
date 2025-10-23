@@ -56,6 +56,10 @@ span.icon {
   height: 16px;
 }
 
+.switch-destructive:checked {
+  background-color: #fa5e55 !important;
+}
+
 /* .badge, .badge-primary, .badge-secondary, .badge-destructive, .badge-outline {
   overflow: visible;
 } */

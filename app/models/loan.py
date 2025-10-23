@@ -1,9 +1,8 @@
 from sqlalchemy import Column, Integer, DateTime, TIMESTAMP, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from datetime import datetime, timedelta
+from datetime import datetime
 from app.models.base import BaseModel
-from typing import Optional
 
 class Loan(BaseModel):
     __tablename__ = 'loans'

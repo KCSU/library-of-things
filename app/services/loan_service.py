@@ -1,9 +1,7 @@
 from datetime import datetime
 from typing import List, Optional, Dict
 
-from app.models.item import Item
-from app.models.loan import Loan, Request
-from app.models.user import User
+from app.models import Item, Loan, Request, User
 from app.services.item_service import ItemService
 from app.utils.database import db_session
 

@@ -37,6 +37,9 @@ def create_app(config_name='development'):
     # Register blueprints
     register_blueprints(app)
     
+    # Register favicon routes
+    register_favicon_routes(app)
+    
     # Register context processors
     register_context_processors(app)
     
@@ -44,6 +47,49 @@ def create_app(config_name='development'):
     register_error_handlers(app)
     
     return app
+
+def register_favicon_routes(app):
+    """Register routes for favicon files"""
+    from flask import send_from_directory, request
+    import os
+    
+    @app.route('/favicon.ico')
+    def favicon():
+        return send_from_directory(
+            os.path.join(app.root_path, 'static', 'favicon'),
+            'favicon.ico',
+            mimetype='image/vnd.microsoft.icon'
+        )
+    
+    @app.route('/site.webmanifest')
+    @app.route('/manifest.json')
+    def manifest():
+        return send_from_directory(
+            os.path.join(app.root_path, 'static', 'favicon'),
+            'manifest.json',
+            mimetype='application/json'
+        )
+    
+    @app.route('/browserconfig.xml')
+    def browserconfig():
+        return send_from_directory(
+            os.path.join(app.root_path, 'static', 'favicon'),
+            'browserconfig.xml',
+            mimetype='application/xml'
+        )
+    
+    @app.route('/apple-touch-icon.png')
+    @app.route('/android-chrome-192x192.png')
+    @app.route('/android-chrome-512x512.png')
+    @app.route('/favicon-16x16.png')
+    @app.route('/favicon-32x32.png')
+    def favicon_png():
+        filename = os.path.basename(request.path)
+        return send_from_directory(
+            os.path.join(app.root_path, 'static', 'favicon'),
+            filename,
+            mimetype='image/png'
+        )
 
 def register_context_processors(app):
     """Register template context processors"""

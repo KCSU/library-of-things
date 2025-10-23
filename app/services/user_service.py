@@ -2,7 +2,7 @@ from typing import List, Optional
 from cachetools.func import ttl_cache
 from sqlalchemy.orm import selectinload
 from app.utils.database import db_session
-from app.models.user import User
+from app.models import User
 
 
 class UserService:

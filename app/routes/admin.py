@@ -3,6 +3,7 @@ from app.utils.decorators import admin_required
 from app.services.user_service import UserService
 from app.services.item_service import ItemService
 from app.services.loan_service import LoanService
+from app.services.settings_service import SettingsService
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -51,7 +52,9 @@ def admins(user):
 @admin_bp.route('/settings')
 @admin_required
 def settings(user):
-    return render_template('admin/settings.html', user=user)
+    announcement = SettingsService.get_announcement()
+    read_only = SettingsService.get_read_only_mode()
+    return render_template('admin/settings.html', user=user, announcement=announcement, read_only=read_only)
 
 # API endpoints for admin actions
 
@@ -158,7 +161,7 @@ def api_approve_request(user):
     try:
         # Get the request to check if it's a loan or return
         from app.utils.database import db_session
-        from app.models.loan import Request
+        from app.models import Request
         
         with db_session() as session:
             req = session.query(Request).filter(Request.id == request_id).first()
@@ -191,6 +194,28 @@ def api_refuse_request(user):
             # TODO: Send notification with reason
             return jsonify({'success': True})
         return jsonify({'error': 'Request not found'}), 404
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@admin_bp.route('/api/update_settings', methods=['POST'])
+@admin_required
+def api_update_settings(user):
+    """Update all settings"""
+    payload = request.get_json()
+    
+    try:
+        # Update announcement
+        announcement = payload.get('announcement', {})
+        text = announcement.get('text', '')
+        enabled = announcement.get('enabled', False)
+        SettingsService.update_announcement(text, enabled)
+        
+        # Update read-only mode
+        read_only = payload.get('read_only', False)
+        SettingsService.set_read_only_mode(read_only)
+        
+        return jsonify({'success': True})
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500

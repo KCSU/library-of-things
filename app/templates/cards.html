@@ -1,55 +1,68 @@
-{% for item in items %}
-<div class="card">
-  <header>
-    <h2>{{ item.title }}</h2>
-    <p>{{ item.description }}</p>
-  </header>
-  <section class="px-0">
-    <img loading="lazy" class="aspect-video object-cover hover:cursor-pointer w-full"
-      referrerpolicy="no-referrer"
-      style="color:transparent" src="{{ item.image_url }}" alt="{{ item.title }}: {{ item.description }}"
-      title="Click to expand image" />
-  </section>
-  <footer class="flex items-center gap-2">
-    <span class="badge-outline">
-      <span class="icon" data-icon="category/{{ item.category.lower() }}"></span>
-      {{ item.category | capitalize }}
-    </span>
-    {% if item.loan_policy == "seven_days" %}
-    <span class="badge-outline">
-      <span class="icon" data-icon="clock-2"></span>
-      7 days
-    </span>
-    {% elif item.loan_policy == "thirty_days" %}
-    <span class="badge-outline">
-      <span class="icon" data-icon="clock-7"></span>
-      30 days
-    </span>
-    {% elif item.loan_policy == "academic_year_end" %}
-    <span class="badge-outline">
-      <span class="icon" data-icon="clock-10"></span>
-      Year End
-    </span>
-    {% elif item.loan_policy == "permanent" %}
-    <span class="badge-outline">
-      <span class="icon" data-icon="infinity"></span>
-      Permanent
-    </span>
-    {% endif %}
-    {#{% if item.count > 1 %}
-    <span class="badge-outline" data-tooltip="{{ item.available_count }} of {{ item.count }} available">
-      {{ item.available_count }}/{{ item.count }}
-    </span>
-    {% endif %}#}
-    {% if item.available_count <= 0 %}
-    <span class="ml-auto" style="cursor: not-allowed;">
-      <button class="btn font-medium" style="pointer-events: none" disabled>Out of stock</button>
-    </span>
-    {% elif item.loan_policy == "permanent" %}
-    <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn ml-auto font-medium">Take</button>
-    {% else %}
-    <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn ml-auto font-medium">Borrow</button>
-    {% endif %}
-  </footer>
+{% if items | length == 0 %}
+<header class="ml-8 mt-4">
+  <h2 class="text-2xl font-semibold tracking-tight mb-2">Nothing to see here!</h2>
+  <p class="text-[1.05rem] text-gray-300">Try removing your search filters, or check back later.</p>
+</header>
+{% endif %}
+
+<div class="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+  {% for item in items %}
+  <div class="card">
+    <header>
+      <h2>{{ item.title }}</h2>
+      <p>{{ item.description }}</p>
+    </header>
+    <section class="px-0">
+      <img loading="lazy" class="aspect-video object-cover hover:cursor-pointer w-full"
+        referrerpolicy="no-referrer"
+        style="color:transparent" src="{{ item.image_url }}" alt="{{ item.title }}: {{ item.description }}"
+        title="Click to expand image" />
+    </section>
+    <footer class="flex items-center gap-2">
+      <span class="badge-outline">
+        <span class="icon" data-icon="category/{{ item.category.lower() }}"></span>
+        {{ item.category | capitalize }}
+      </span>
+      {% if item.loan_policy == "seven_days" %}
+      <span class="badge-outline">
+        <span class="icon" data-icon="clock-2"></span>
+        7 days
+      </span>
+      {% elif item.loan_policy == "thirty_days" %}
+      <span class="badge-outline">
+        <span class="icon" data-icon="clock-7"></span>
+        30 days
+      </span>
+      {% elif item.loan_policy == "academic_year_end" %}
+      <span class="badge-outline">
+        <span class="icon" data-icon="clock-10"></span>
+        Year End
+      </span>
+      {% elif item.loan_policy == "permanent" %}
+      <span class="badge-outline">
+        <span class="icon" data-icon="infinity"></span>
+        Permanent
+      </span>
+      {% endif %}
+      {#{% if item.count > 1 %}
+      <span class="badge-outline" data-tooltip="{{ item.available_count }} of {{ item.count }} available">
+        {{ item.available_count }}/{{ item.count }}
+      </span>
+      {% endif %}#}
+      {% if read_only %}
+      <span class="ml-auto" style="cursor: not-allowed;">
+        <button class="btn font-medium" style="pointer-events: none" disabled>Disabled</button>
+      </span>
+      {% elif item.available_count <= 0 %}
+      <span class="ml-auto" style="cursor: not-allowed;">
+        <button class="btn font-medium" style="pointer-events: none" disabled>Out of stock</button>
+      </span>
+      {% elif item.loan_policy == "permanent" %}
+      <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn ml-auto font-medium">Take</button>
+      {% else %}
+      <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn ml-auto font-medium">Borrow</button>
+      {% endif %}
+    </footer>
+  </div>
+  {% endfor %}
 </div>
-{% endfor %}

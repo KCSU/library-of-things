@@ -1,8 +1,49 @@
 {% extends "sidebar.html" %}
 {% block content %}
 
-<main class="px-6 py-6">
-  Nothing here yet!
-</main>
+<div class="max-w-3xl mx-auto pt-6">
+  <header class="mb-8">
+    <h1 class="text-3xl font-semibold tracking-tight mb-2">Site Settings</h1>
+    <p class="text-[1.05rem] text-gray-300">
+      Miscellaneous website configurations.
+    </p>
+  </header>
+  
+  <form class="form grid gap-6" id="settings-form">
+    <section class="grid gap-4">
+      <h3 class="text-lg font-medium">Public Announcements</h3>
+
+      <div class="grid gap-2">
+        <label class="text-current" for="announcement-text">Announcement text</label>
+        <textarea id="announcement-text" rows="3" placeholder="Enter your message here...">{{ announcement.text if announcement else '' }}</textarea>
+        <p class="text-gray-500 text-sm" id="announcement-text-caption">If enabled, this message will be displayed to all users on the homepage.</p>
+      </div>
+      
+      <div class="gap-2 flex flex-row items-start justify-between rounded-lg border p-4 shadow-xs">
+        <div class="flex flex-col gap-0.5">
+          <label for="announcement-toggle" class="leading-normal">Enable announcement banner</label>
+          <p class="text-muted-foreground text-sm">Display an announcement at the top of the homepage.</p>
+        </div>
+        <input type="checkbox" id="announcement-toggle" role="switch" onchange="toggleAnnouncementText()" {{ 'checked' if announcement and announcement.enabled else '' }}>
+      </div>
+    </section>
+
+    <section class="grid gap-4">
+      <h3 class="text-lg font-medium">Danger Zone</h3>
+
+      <div class="gap-2 flex flex-row items-start justify-between rounded-lg border p-4 shadow-xs border-[#f8514966]">
+        <div class="flex flex-col gap-0.5">
+          <label for="read-only-toggle" class="leading-normal">Read-only mode</label>
+          <p class="text-muted-foreground text-sm">Prevent all users from interacting with the website, e.g.: submitting item requests.</p>
+        </div>
+        <input type="checkbox" class="switch-destructive" id="read-only-toggle" role="switch" onchange="toggleReadOnlyMode()" {{ 'checked' if read_only else '' }}>
+      </div>
+    </section>
+
+    <button type="submit" class="btn w-fit px-8">Save Settings</button>
+  </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 
 {% endblock %}

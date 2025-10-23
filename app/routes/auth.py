@@ -1,6 +1,7 @@
 from app.utils.decorators import login_required
 from flask import (Blueprint, current_app, redirect, render_template, request, session,
                    url_for)
+from app.services.settings_service import SettingsService
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -9,7 +10,8 @@ auth_bp = Blueprint('auth', __name__)
 def index(user):
     # Get category from query parameters for sidebar highlighting
     category = request.args.get('category', None)
-    return render_template('index.html', user=user, category=category)
+    announcement = SettingsService.get_announcement()
+    return render_template('index.html', user=user, category=category, announcement=announcement)
 
 @auth_bp.route('/login')
 def login():

@@ -1,9 +1,9 @@
 {% extends "sidebar.html" %}
 {% block content %}
 
-<div class="fixed top-0 left-0 w-full h-full z-[99] bg-black/30 backdrop-blur-sm hidden cursor-pointer transition-opacity duration-300 opacity-0 overlay" id="confirm-overlay" onclick="dismissOverlay()">
+<div class="fixed top-0 left-0 w-full h-full z-99 bg-black/30 backdrop-blur-sm hidden cursor-pointer transition-opacity duration-300 opacity-0 overlay" id="confirm-overlay" onclick="dismissOverlay()">
   <div class="flex items-center justify-center h-full w-full">
-    <div class="card w-2/5 mb-5 border-[oklch(1 0 0/25%)] border-[1px] cursor-default" onclick="event.stopPropagation()">
+    <div class="card w-2/5 mb-5 border-[oklch(1 0 0/25%)] border cursor-default" onclick="event.stopPropagation()">
       <section class="text-sm">
         <h2 class="font-semibold text-lg">Please read the following carefully before proceeding:</h2>
         <ul class="mt-4 flex list-disc flex-col gap-2 pl-6">
@@ -27,32 +27,69 @@
   </div>
 </div>
 
-<div class="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="cards-container">
-  {# TODO(lucas): possibly fade in to reduce SSR flicker? #}
-  {% for _ in range(5) %}
-  <div class="card">
-    <header>
-      <div class="h-4 bg-gray-200 animate-pulse rounded-full dark:bg-gray-700 w-36 mb-2"></div>
-      <div class="h-2.5 bg-gray-200 animate-pulse rounded-full dark:bg-gray-700 w-full"></div>
-      <div class="h-2.5 bg-gray-200 animate-pulse rounded-full dark:bg-gray-700 w-1/4"></div>
-    </header>
-    <section class="px-0">
-      <div class="flex items-center justify-center h-48 animate-pulse bg-gray-300 dark:bg-gray-700">
-        <svg class="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor" viewBox="0 0 20 18">
-          <path
-            d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-        </svg>
-      </div>
-    </section>
-    <footer class="flex items-center gap-2">
-      <div class="h-4 bg-gray-200 animate-pulse rounded-md dark:bg-gray-700 w-10"></div>
-      <div class="h-4 bg-gray-200 animate-pulse rounded-md dark:bg-gray-700 w-16"></div>
-      <div class="h-4 bg-gray-200 animate-pulse rounded-md dark:bg-gray-700 w-10"></div>
-      <div class="h-4 ml-auto bg-gray-200 animate-pulse rounded-md dark:bg-gray-700 w-24"></div>
-    </footer>
+{% if announcement.enabled %}
+<div id="announcement-banner" class="sticky top-4 z-50 mb-6 w-full bg-[#332701] text-[#ffda6a] border-[#997404] border rounded-xl drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3 flex-1">
+      <svg class="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" x2="12" y1="8" y2="12"/>
+        <line x1="12" x2="12.01" y1="16" y2="16"/>
+      </svg>
+      <p class="text-sm md:text-base font-normal tracking-[-0.01em]">
+        {{ announcement.text }}
+      </p>
+    </div>
+    <button onclick="dismissAnnouncement()" class="shrink-0 p-1 cursor-pointer rounded transition-colors" aria-label="Dismiss announcement">
+      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
   </div>
-  {% endfor %}
+</div>
+{% endif %}
+
+<script>
+function dismissAnnouncement() {
+  const banner = document.getElementById('announcement-banner');
+  banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  banner.style.opacity = '0';
+  banner.style.transform = 'translateY(-100%)';
+  setTimeout(() => {
+    banner.style.display = 'none';
+  }, 300);
+}
+</script>
+
+<div id="cards-container">
+  <div class="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" >
+    {# TODO(lucas): possibly fade in to reduce SSR flicker? #}
+    {% for _ in range(5) %}
+    <div class="card">
+      <header>
+        <div class="h-4 bg-gray-200 animate-pulse rounded-full dark:bg-gray-700 w-36 mb-2"></div>
+        <div class="h-2.5 bg-gray-200 animate-pulse rounded-full dark:bg-gray-700 w-full"></div>
+        <div class="h-2.5 bg-gray-200 animate-pulse rounded-full dark:bg-gray-700 w-1/4"></div>
+      </header>
+      <section class="px-0">
+        <div class="flex items-center justify-center h-48 animate-pulse bg-gray-300 dark:bg-gray-700">
+          <svg class="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor" viewBox="0 0 20 18">
+            <path
+              d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+          </svg>
+        </div>
+      </section>
+      <footer class="flex items-center gap-2">
+        <div class="h-4 bg-gray-200 animate-pulse rounded-md dark:bg-gray-700 w-10"></div>
+        <div class="h-4 bg-gray-200 animate-pulse rounded-md dark:bg-gray-700 w-16"></div>
+        <div class="h-4 bg-gray-200 animate-pulse rounded-md dark:bg-gray-700 w-10"></div>
+        <div class="h-4 ml-auto bg-gray-200 animate-pulse rounded-md dark:bg-gray-700 w-24"></div>
+      </footer>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}

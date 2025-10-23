@@ -9,7 +9,7 @@ $(document).ready(() => {
   // Server-side render the cards, then replace the HTML
   $("#cards-container").load(ssrUrl, () => {
     // Once finished, load icons asynchronously
-    $('span.icon').each((_, el) => {
+    $('#cards-container span.icon').each((_, el) => {
       const iconName = $(el).data('icon');
       $(el).load("/static/icons/" + iconName + ".svg");
     });
@@ -63,7 +63,16 @@ function requestItem() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }
   })
-    .then(res => res.json())
+    .then(res => {
+      if (res.status === 403) {
+        return res.json().then(data => {
+          alert(data.error || 'Site is in read-only mode');
+          dismissOverlay();
+          throw new Error('Read-only mode');
+        });
+      }
+      return res.json();
+    })
     .then(result => {
       if (result.success) {
         dismissOverlay();
@@ -74,6 +83,8 @@ function requestItem() {
       }
     })
     .catch(err => {
-      alert('Network error: ' + err.message);
+      if (err.message !== 'Read-only mode') {
+        alert('Network error: ' + err.message);
+      }
     });
 }

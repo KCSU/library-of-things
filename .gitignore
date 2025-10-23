@@ -223,3 +223,4 @@ static/css/output.css
 
 # Miscellaneous
 .DS_Store
+.trunk
