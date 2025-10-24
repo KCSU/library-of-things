@@ -18,11 +18,7 @@
         style="color:transparent" src="{{ item.image_url }}" alt="{{ item.title }}: {{ item.description }}"
         title="Click to expand image" />
     </section>
-    <footer class="flex items-center gap-2 flex-wrap min-w-0">
-      {#<span class="badge-outline py-1.5 px-2">
-        <span class="icon" data-icon="category/{{ item.category.lower() }}"></span>
-        {{ item.category | capitalize }}
-      </span>#}
+    <footer class="flex items-center gap-x-2 gap-y-4 flex-wrap min-w-0">
       {% if item.loan_policy == "seven_days" %}
       <span class="badge-outline py-1.5 px-2">
         <span class="icon" data-icon="clock-2"></span>
@@ -49,17 +45,17 @@
         {{ item.available_count }} / {{ item.count }} left
       </span>
       {% if read_only %}
-      <span class="ml-auto" style="cursor: not-allowed;">
-        <button class="btn font-medium" style="pointer-events: none" disabled>Disabled</button>
+      <span class="w-full sm:w-auto sm:ml-auto" style="cursor: not-allowed;">
+        <button class="btn font-medium w-full sm:w-auto" style="pointer-events: none" disabled>Disabled</button>
       </span>
       {% elif item.available_count <= 0 %}
-      <span class="ml-auto" style="cursor: not-allowed;">
-        <button class="btn font-medium" style="pointer-events: none" disabled>Out of stock</button>
+      <span class="w-full sm:w-auto sm:ml-auto" style="cursor: not-allowed;">
+        <button class="btn font-medium w-full sm:w-auto" style="pointer-events: none" disabled>Out of stock</button>
       </span>
       {% elif item.loan_policy == "permanent" %}
-      <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn ml-auto font-medium">Take</button>
+      <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn font-medium w-full sm:w-auto sm:ml-auto">Take</button>
       {% else %}
-      <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn ml-auto font-medium">Borrow</button>
+      <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn font-medium w-full sm:w-auto sm:ml-auto">Borrow</button>
       {% endif %}
     </footer>
   </div>
