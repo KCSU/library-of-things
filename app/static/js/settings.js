@@ -1,6 +1,6 @@
 $(document).ready(function() {
   // Initialize textarea state based on toggle
-  toggleAnnouncementTextarea();
+  toggleAnnouncementText();
   
   // Handle form submission
   $('#settings-form').on('submit', function(e) {
@@ -33,7 +33,7 @@ $(document).ready(function() {
   });
 });
 
-function toggleAnnouncementTextarea() {
+function toggleAnnouncementText() {
   const toggle = $('#announcement-toggle');
   const textarea = $('#announcement-text');
   textarea.prop('disabled', !toggle.prop('checked'));
