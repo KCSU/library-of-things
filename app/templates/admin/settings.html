@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="container mx-auto p-2 md:px-6 lg:px-16">
-   <header class="mb-10">
+  <header class="mb-10">
     <h2 class="text-2xl font-semibold tracking-tight mb-2">Site Settings</h2>
     <p class="text-[1.05rem] text-gray-300">Miscellaneous website configurations.</p>
   </header>
@@ -13,7 +13,7 @@
 
       <div class="grid gap-2">
         <label class="text-current" for="announcement-text">Announcement text</label>
-        <textarea id="announcement-text" rows="3" placeholder="Enter your message here...">{{ announcement.text if announcement else '' }}</textarea>
+        <textarea id="announcement-text" class="text-sm" rows="3" placeholder="Enter your message here...">{{ announcement.text if announcement else '' }}</textarea>
         <p class="text-gray-500 text-sm" id="announcement-text-caption">If enabled, this message will be displayed to all users on the homepage.</p>
       </div>
       

@@ -39,8 +39,8 @@
           {% endif %}
           <td class="text-ellipsis overflow-hidden">{{ req.request_time }}</td>
           <td>
-            <button onclick="deliverItem({{ req.id }}, {{ req.item_id }}, '{{ req.borrower_crsid }}@cam.ac.uk')" class="btn btn-secondary text-sm h-[2.25em] mr-1">Confirm Delivery</button>
-            <button onclick="refuseRequest({{ req.id }})" class="btn btn-destructive text-sm h-[2.25em] mr-1">Refuse</button>
+            <button onclick='acceptRequest({{ req | tojson }})' class="btn btn-secondary text-sm h-[2.25em] mr-1">Confirm Delivery</button>
+            <button onclick='refuseRequest({{ req | tojson }})' class="btn btn-destructive text-sm h-[2.25em] mr-1">Refuse</button>
           </td>
         </tr>
       </tbody>

@@ -1,16 +1,4 @@
-/**
- * Requests Management JavaScript
- * 
- * Handles the admin requests panel functionality:
- * - Accepting item requests (creating loans)
- * - Refusing/rejecting item requests
- * 
- * API Endpoints used:
- * - POST /admin/api/accept_request - Accept request and create loan
- * - POST /admin/api/refuse_request - Refuse a borrow request
- */
-
-function acceptRequest(requestId) {
+function acceptRequest(req) {
   if (!confirm('Are you sure you want to mark the item as delivered?')) {
     return;
   }
@@ -18,7 +6,7 @@ function acceptRequest(requestId) {
   fetch('/admin/api/accept_request', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: requestId })
+    body: JSON.stringify({ id: req.id })
   })
     .then(res => res.json())
     .then(result => {
@@ -33,12 +21,7 @@ function acceptRequest(requestId) {
     });
 }
 
-// Alias for backward compatibility
-function deliverItem(requestId, itemId, email) {
-  acceptRequest(requestId);
-}
-
-function refuseRequest(requestId) {
+function refuseRequest(req) {
   const reason = prompt('Please give your reason for refusing this request:');
   if (!reason) {
     return; // Must give a reason to refuse
@@ -47,7 +30,7 @@ function refuseRequest(requestId) {
   fetch('/admin/api/refuse_request', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: requestId, reason: reason })
+    body: JSON.stringify({ id: req.id, reason: reason })
   })
     .then(res => res.json())
     .then(result => {
