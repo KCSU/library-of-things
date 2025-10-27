@@ -2,11 +2,13 @@ from app.config import config
 from app.utils.database import init_database
 from authlib.integrations.flask_client import OAuth
 from flask import Flask
+from flask_talisman import Talisman
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def create_app(config_name='development'):
     app = Flask(__name__)
+    Talisman(app, content_security_policy=None)
     
     # Load configuration
     app.config.from_object(config[config_name])
@@ -50,8 +52,9 @@ def create_app(config_name='development'):
 
 def register_favicon_routes(app):
     """Register routes for favicon files"""
-    from flask import send_from_directory, request
     import os
+
+    from flask import request, send_from_directory
     
     @app.route('/favicon.ico')
     def favicon():
@@ -96,8 +99,8 @@ def register_context_processors(app):
     @app.context_processor
     def inject_pending_requests_count():
         """Inject pending requests count for admin users"""
-        from flask import session
         from app.services.loan_service import LoanService
+        from flask import session
         
         user = session.get('user')
         pending_requests_count = 0
