@@ -19,12 +19,11 @@
     </tbody>
   </table>
   
-  <!-- Pagination Controls -->
-  <div class="flex justify-between items-center mt-4 text-sm">
+  <div class="flex flex-col md:flex-row justify-between items-center mt-4 text-sm gap-4">
     <div class="text-gray-600">
       Showing <span id="start-item">1</span> to <span id="end-item">50</span> of <span id="total-items">{{ users|length }}</span> users
     </div>
-    <div class="flex gap-2 items-center">
+    <div class="flex gap-2 items-center max-md:pb-4">
       <button id="prev-btn" class="btn btn-secondary" onclick="changePage(-1)" disabled>Previous</button>
       <span id="page-info" class="px-3">Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
       <button id="next-btn" class="btn btn-secondary" onclick="changePage(1)">Next</button>

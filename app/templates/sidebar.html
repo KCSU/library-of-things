@@ -1,29 +1,81 @@
 {% extends "base.html" %}
 
 {% block preamble %}
-<aside class="sidebar" data-side="left" aria-hidden="false">
-  <nav aria-label="Sidebar navigation">
+<div 
+  id="mobile-navbar" 
+  class="fixed top-0 left-0 right-0 z-25 md:hidden w-full p-2 border-b border-[oklch(1_0_0/0.1)] bg-[oklch(.205_0_0)] flex items-center justify-between" 
+  style="transition: opacity 300ms ease-in-out;"
+>
+  <a href="/" class="flex items-center" aria-label="KCSU Home">
+    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="KCSU Logo" class="h-6 pl-3" />
+  </a>
+  <button 
+    type="button" 
+    onclick="document.dispatchEvent(new CustomEvent('basecoat:sidebar'))"
+    aria-label="Toggle menu"
+    class="ml-auto p-2"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="4" x2="20" y1="12" y2="12"/>
+      <line x1="4" x2="20" y1="6" y2="6"/>
+      <line x1="4" x2="20" y1="18" y2="18"/>
+    </svg>
+  </button>
+</div>
+
+<div 
+  id="sidebar-overlay" 
+  class="md:hidden fixed inset-0 z-30 bg-black/50 opacity-0 pointer-events-none overscroll-none touch-none" 
+  style="transition: opacity 300ms ease-in-out;"
+  onclick="document.dispatchEvent(new CustomEvent('basecoat:sidebar', { detail: { action: 'close' } }))"
+  ontouchmove="event.preventDefault()"
+  onwheel="event.preventDefault()"
+></div>
+
+<script>
+  $(document).ready(function() {
+    const $sidebar = $('.sidebar');
+    const $navbar = $('#mobile-navbar');
+    const $overlay = $('#sidebar-overlay');
+    
+    const observer = new MutationObserver(function(mutations) {
+      if (window.innerWidth >= 768) return; // md breakpoint
+
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'aria-hidden') {
+          const isHidden = $sidebar.attr('aria-hidden') === 'true';
+          
+          if (isHidden) {
+            $overlay.css({ opacity: '0', pointerEvents: 'none' });
+            $('body').css('overflow', '');
+          } else {
+            $overlay.css({ opacity: '1', pointerEvents: 'auto' });
+            $('body').css('overflow', 'hidden');
+          }
+        }
+      });
+    });
+    
+    observer.observe($sidebar[0], { attributes: true });
+  });
+</script>
+
+<aside 
+  class="sidebar max-md:fixed max-md:inset-0 bg-transparent! max-md:aria-hidden:translate-x-[-200%] max-md:transition-transform max-md:duration-300 max-md:bg-[oklch(0.205_0_0)]" 
+  data-side="left" 
+  aria-hidden="false"
+>
+  <nav aria-label="Sidebar navigation" class="relative z-10">
     <header>
-      <a href="/" class="btn-ghost p-2 h-12 w-full justifwy-start">
+      <a href="/" class="btn-ghost p-2 h-12 w-full justify-start">
         <div
           class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
           <img class="rounded-sm" src="{{ url_for('static', filename='images/logo.jpg') }}">
         </div>
         <div class="grid flex-1 text-left text-sm leading-tight">
           <span class="truncate font-medium">Library of Things</span>
-          <span class="truncate text-xs">v0.2.3</span>
+          <span class="truncate text-xs">v0.2.4</span>
         </div>
-        {# <button
-          type="button"
-          aria-label="Toggle dark mode"
-          data-tooltip="Toggle dark mode"
-          data-side="bottom"
-          onclick="document.dispatchEvent(new CustomEvent('basecoat:theme'))"
-          class="btn-icon-outline size-8"
-        >
-          <span class="hidden dark:block"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></svg></span>
-          <span class="block dark:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg></span>
-        </button> #}
       </a>
     </header>
     <section class="scrollbar">
@@ -136,7 +188,7 @@
 {% endblock %}
 
 {% block main %}
-<div class="container w-screen p-8">
+<div class="w-full p-8 max-md:pt-22">
   {% block content %}{% endblock %}
   <footer class="mt-10">
     <hr class="my-6 w-full" />

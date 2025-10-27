@@ -28,8 +28,8 @@
 </div>
 
 {% if announcement.enabled %}
-<div id="announcement-banner" class="sticky top-4 z-50 mb-6 xl:mx-8 bg-[#332701] text-[#ffda6a] border-[#997404] border rounded-xl drop-shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
-  <div class="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+<div id="announcement-banner" class="sticky max-md:z-20 top-18 md:top-4 z-40 mb-6 xl:mx-8 bg-[#332701] text-[#ffda6a] border-[#997404] border rounded-xl drop-shadow-[0_0_50px_rgba(0,0,0,1)]">
+  <div class="container px-4 py-3 flex items-center justify-between gap-4">
     <div class="flex items-center gap-3 flex-1">
       <svg class="w-5 h-5 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
@@ -52,12 +52,13 @@
 
 <script>
 function dismissAnnouncement() {
-  const banner = document.getElementById('announcement-banner');
-  banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-  banner.style.opacity = '0';
-  banner.style.transform = 'translateY(-100%)';
+  $('#announcement-banner').css({
+    transition: 'opacity 0.3s ease, transform 0.3s ease',
+    opacity: '0',
+    transform: 'translateY(-100%)'
+  });
   setTimeout(() => {
-    banner.style.display = 'none';
+    $('#announcement-banner').hide();
   }, 300);
 }
 </script>

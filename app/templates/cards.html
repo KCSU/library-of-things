@@ -1,5 +1,5 @@
 {% if items | length == 0 %}
-<header class="ml-8 mt-4">
+<header class="xl:ml-8 mt-4">
   <h2 class="text-2xl font-semibold tracking-tight mb-2">Nothing to see here!</h2>
   <p class="text-[1.05rem] text-gray-300">Try removing your search filters, or check back later.</p>
 </header>
@@ -45,12 +45,12 @@
         {{ item.available_count }} / {{ item.count }} left
       </span>
       {% if read_only %}
-      <span class="w-full sm:w-auto sm:ml-auto" style="cursor: not-allowed;">
-        <button class="btn font-medium w-full sm:w-auto" style="pointer-events: none" disabled>Disabled</button>
+      <span class="w-full md:w-auto md:ml-auto" style="cursor: not-allowed;">
+        <button class="btn font-medium w-full md:w-auto" style="pointer-events: none" disabled>Disabled</button>
       </span>
       {% elif item.available_count <= 0 %}
-      <span class="w-full sm:w-auto sm:ml-auto" style="cursor: not-allowed;">
-        <button class="btn font-medium w-full sm:w-auto" style="pointer-events: none" disabled>Out of stock</button>
+      <span class="w-full md:w-auto md:ml-auto" style="cursor: not-allowed;">
+        <button class="btn font-medium w-full md:w-auto" style="pointer-events: none" disabled>Out of stock</button>
       </span>
       {% elif item.loan_policy == "permanent" %}
       <button onclick='showConfirmOverlay({{ item | tojson }})' class="btn font-medium w-full sm:w-auto sm:ml-auto">Take</button>

@@ -17,8 +17,8 @@ def init_database(database_url: str):
         echo=False,
         pool_pre_ping=True,  # Test connections before using them
         pool_recycle=3600,   # Recycle connections after 1 hour
-        pool_size=10,        # Number of connections to maintain
-        max_overflow=20      # Max additional connections when pool is full
+        pool_size=20,        # Number of connections to maintain
+        max_overflow=30      # Max additional connections when pool is full
     )
     SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
     
