@@ -74,7 +74,7 @@
         </div>
         <div class="grid flex-1 text-left text-sm leading-tight">
           <span class="truncate font-medium">Library of Things</span>
-          <span class="truncate text-xs">v0.2.4</span>
+          <span class="truncate text-xs">v1.0.1</span>
         </div>
       </a>
     </header>
@@ -116,6 +116,23 @@
             <a href="/?category=others" class="{% if category == 'others' %}{% else %}bg-inherit! font-normal!{% endif %}">
               <span class="icon" data-icon="category/others"></span>
               <span>Others</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div role="group">
+        <h3>Personal</h3>
+        <ul>
+          <li>
+            <a href="/user/requests">
+              <span class="icon" data-icon="clock-2"></span>
+              <span>Pending Requests</span>
+            </a>
+          </li>
+          <li>
+            <a href="/user/borrowed">
+              <span class="icon" data-icon="on-loan"></span>
+              <span>Borrowed Items</span>
             </a>
           </li>
         </ul>
@@ -188,7 +205,7 @@
 {% endblock %}
 
 {% block main %}
-<div class="w-full p-8 max-md:pt-22">
+<div class="w-full p-8 max-md:pt-22 lg:pt-12">
   {% block content %}{% endblock %}
   <footer class="mt-10">
     <hr class="my-6 w-full" />

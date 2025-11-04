@@ -1,0 +1,51 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="container mx-auto p-2 md:px-6 lg:px-16">
+  {% if loans %}
+  <header class="mb-10">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">My Borrowed Items</h2>
+    <p class="text-[1.05rem] text-gray-300">Keep track of your current loans and due dates. To return your item, send an email to the person who gave you the item.</p>
+  </header>
+  <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Item Name</th>
+          <th>Image</th>
+          <th>Start Date</th>
+          <th>Due Date</th>
+        </tr>
+      </thead>
+      {% for loan in loans %}
+      <tbody>
+        <tr>
+          <td class="font-medium">{{ loop.index }}</td>
+          <td class="text-ellipsis overflow-hidden">{{ loan.item_title }}</td>
+          <td><a class="hover:underline text-blue-500" target="_blank" href="{{ loan.item_image_url }}">Link</a></td>
+          <td>{{ loan.start_time }}</td>
+          <td>
+            {% if loan.is_overdue %}
+            <div style="color: oklch(.704 .191 22.216)" data-tooltip="This item is overdue! Return it as soon as possible." data-side="top" data-align="center">
+              <span class="inline-block icon w-4!" data-icon="warning"></span>
+              {{ loan.due_date }}
+            </div>
+            {% else %}
+            {{ loan.due_date }}
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <header class="mb-10">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">My Borrowed Items</h2>
+    <p class="text-[1.05rem] text-gray-300">You don't have any borrowed items!</p>
+  </header>
+  {% endif %}
+</div>
+
+{% endblock %}

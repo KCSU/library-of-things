@@ -1,0 +1,40 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="container mx-auto p-2 md:px-6 lg:px-16">
+  {% if requests %}
+  <header class="mb-10">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">My Requests</h2>
+    <p class="text-[1.05rem] text-gray-300">Someone will be in contact with you shortly. (This is a manual process &mdash; please be patient!)</p>
+  </header>
+  <div class="overflow-x-auto">
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Image</th>
+          <th>Time of Request</th>
+        </tr>
+      </thead>
+      {% for req in requests %}
+      <tbody>
+        <tr>
+          <td class="font-medium">{{ loop.index }}</td>
+          <td class="text-ellipsis overflow-hidden">{{ req.item_title }}</td>
+          <td class="text-ellipsis overflow-hidden"><a href="{{ req.item_image_url }}" class="text-blue-500 hover:underline" target="_blank">Link</a></td>
+          <td class="text-ellipsis overflow-hidden">{{ req.request_time }}</td>
+        </tr>
+      </tbody>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <header class="mb-10">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">My Requests</h2>
+    <p class="text-[1.05rem] text-gray-300">You don't have any pending item requests!</p>
+  </header>
+  {% endif %}
+</div>
+
+{% endblock %}

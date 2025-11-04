@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block main %}
+
+<main class="flex items-center justify-center min-h-screen">
+  <div class="text-center max-w-md px-6">
+    <!-- Large 404 -->
+    <h1 class="text-9xl font-bold text-gray-300 dark:text-gray-700 mb-4">400</h1>
+    
+    <!-- Error message -->
+    <h2 class="text-3xl font-semibold tracking-tight mb-3">Bad Request</h2>
+    <p class="text-[1.05rem] text-gray-400 dark:text-gray-500 mb-8">
+      The server cannot process the request because it's malformed. It should not be retried.
+    </p>
+    
+    <!-- Action buttons -->
+    <div class="flex gap-3 justify-center">
+      <a href="/" class="btn">
+        <span>Go Home</span>
+      </a>
+      <a href="javascript:history.back()" class="btn btn-secondary">
+        <span>Go Back</span>
+      </a>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

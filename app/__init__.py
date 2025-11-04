@@ -121,14 +121,26 @@ def register_blueprints(app):
     from app.routes.admin import admin_bp
     from app.routes.auth import auth_bp
     from app.routes.items import items_bp
+    from app.routes.user import user_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(items_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(user_bp, url_prefix='/user')
 
 def register_error_handlers(app):
     """Register error handlers"""
     from flask import render_template, request, session
+    
+    @app.errorhandler(400)
+    def bad_request(error):
+        # Check if the request wants JSON (API request)
+        if request.path.startswith('/api/') or request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
+            return {'error': 'Bad request'}, 400
+        
+        # Otherwise, render the 400 page
+        user = session.get('user')
+        return render_template('400.html', user=user), 400
     
     @app.errorhandler(404)
     def not_found(error):

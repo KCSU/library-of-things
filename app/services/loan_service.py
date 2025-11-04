@@ -115,6 +115,36 @@ class LoanService:
             return [loan.to_dict() for loan in loans]
     
     @staticmethod
+    def get_user_pending_requests(crsid: str) -> List[dict]:
+        """Get all pending requests for a specific user"""
+        with db_session() as session:
+            user = session.query(User).filter(User.crsid == crsid).first()
+            if not user:
+                return []
+            
+            requests = (session.query(Request)
+                       .join(Item)
+                       .filter(Request.user_id == user.id)
+                       .order_by(Request.request_time.desc())
+                       .all())
+            return [req.to_dict() for req in requests]
+    
+    @staticmethod
+    def get_user_active_loans(crsid: str) -> List[dict]:
+        """Get all active loans for a specific user"""
+        with db_session() as session:
+            user = session.query(User).filter(User.crsid == crsid).first()
+            if not user:
+                return []
+            
+            loans = (session.query(Loan)
+                    .join(Item)
+                    .filter(Loan.user_id == user.id)
+                    .order_by(Loan.due_date.asc())
+                    .all())
+            return [loan.to_dict() for loan in loans]
+    
+    @staticmethod
     def approve_request(request_id: int) -> Dict:
         """
         Approve a request and create a loan (or handle permanent item transfer).
