@@ -3,7 +3,7 @@
 from collections.abc import Iterator
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
@@ -22,7 +22,7 @@ session_factory: scoped_session[Session] | None = None
 def init_database(database_url: str) -> Engine:
     global engine, session_factory
 
-    engine = create_engine(
+    new_engine = create_engine(
         database_url,
         echo=False,
         pool_pre_ping=MYSQL_POOL_PRE_PING,
@@ -31,6 +31,11 @@ def init_database(database_url: str) -> Engine:
         max_overflow=MYSQL_MAX_OVERFLOW,
         pool_timeout=MYSQL_POOL_TIMEOUT_SEC,
     )
+
+    with new_engine.connect() as conn:
+        conn.execute(text('SELECT 1'))
+
+    engine = new_engine
     session_factory = scoped_session(
         sessionmaker(autocommit=False, autoflush=False, bind=engine)
     )

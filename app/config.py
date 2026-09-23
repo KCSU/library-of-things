@@ -1,4 +1,5 @@
 import os
+from urllib.parse import quote
 
 from dotenv import load_dotenv
 
@@ -20,7 +21,8 @@ MYSQL_USERNAME = required_from_env('MYSQL_USERNAME')
 MYSQL_PASSWORD = required_from_env('MYSQL_PASSWORD')
 MYSQL_DATABASE = required_from_env('MYSQL_DATABASE')
 MYSQL_DATABASE_URL = (
-    f'mysql+pymysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}'
+    f"mysql+pymysql://{quote(MYSQL_USERNAME, safe='')}:"
+    f"{quote(MYSQL_PASSWORD, safe='')}"
     f'@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
 )
 MYSQL_POOL_SIZE = 1

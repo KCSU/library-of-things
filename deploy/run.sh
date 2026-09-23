@@ -18,4 +18,4 @@ trap 'kill "$SCHEDULER_PID" 2>/dev/null || true' EXIT INT TERM
 
 # Run the app with gunicorn.
 gunicorn -w 2 -b "unix:$APP_DIR/web.sock" \
-    --umask=0007 --log-file "$APP_DIR/logs/gunicorn-$STAMP.log" app.run:app
+    --log-file "$APP_DIR/logs/gunicorn-$STAMP.log" app.run:app
