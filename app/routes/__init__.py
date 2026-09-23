@@ -1,1 +1,0 @@
-# Route blueprints will be imported by the app factory

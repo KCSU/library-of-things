@@ -69,12 +69,12 @@
     <header>
       <a href="/" class="btn-ghost p-2 h-12 w-full justify-start">
         <div
-          class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+          class="flex aspect-square size-8 items-center justify-center rounded-lg">
           <img class="rounded-sm" src="{{ url_for('static', filename='images/logo.jpg') }}">
         </div>
         <div class="grid flex-1 text-left text-sm leading-tight">
           <span class="truncate font-medium">Library of Things</span>
-          <span class="truncate text-xs">v1.0.1</span>
+          <span class="truncate text-xs">v1.1.0</span>
         </div>
       </a>
     </header>
@@ -84,37 +84,37 @@
         <ul class="">
           <li>
             <a href="/?category=clothing" class="{% if category == 'clothing' %}{% else %}bg-inherit! font-normal!{% endif %}">
-              <span class="icon" data-icon="category/clothing"></span>
+              {{ icon("category/clothing") }}
               <span>Clothing</span>
             </a>
           </li>
           <li>
             <a href="/?category=electronics" class="{% if category == 'electronics' %}{% else %}bg-inherit! font-normal!{% endif %}">
-              <span class="icon" data-icon="category/electronics"></span>
+              {{ icon("category/electronics") }}
               <span>Electronics</span>
             </a>
           </li>
           <li>
             <a href="/?category=furniture" class="{% if category == 'furniture' %}{% else %}bg-inherit! font-normal!{% endif %}">
-              <span class="icon" data-icon="category/furniture"></span>
+              {{ icon("category/furniture") }}
               <span>Furniture</span>
             </a>
           </li>
           <li>
             <a href="/?category=kitchenware" class="{% if category == 'kitchenware' %}{% else %}bg-inherit! font-normal!{% endif %}">
-              <span class="icon" data-icon="category/kitchenware"></span>
+              {{ icon("category/kitchenware") }}
               <span>Kitchenware</span>
             </a>
           </li>
           <li>
             <a href="/?category=sports" class="{% if category == 'sports' %}{% else %}bg-inherit! font-normal!{% endif %}">
-              <span class="icon" data-icon="category/sports"></span>
+              {{ icon("category/sports") }}
               <span>Sports</span>
             </a>
           </li>
           <li>
             <a href="/?category=others" class="{% if category == 'others' %}{% else %}bg-inherit! font-normal!{% endif %}">
-              <span class="icon" data-icon="category/others"></span>
+              {{ icon("category/others") }}
               <span>Others</span>
             </a>
           </li>
@@ -125,31 +125,31 @@
         <ul>
           <li>
             <a href="/user/requests">
-              <span class="icon" data-icon="clock-2"></span>
+              {{ icon("clock-2") }}
               <span>Pending Requests</span>
             </a>
           </li>
           <li>
             <a href="/user/borrowed">
-              <span class="icon" data-icon="on-loan"></span>
+              {{ icon("on-loan") }}
               <span>Borrowed Items</span>
             </a>
           </li>
         </ul>
       </div>
-      {% if user.is_admin %}
+      {% if user.is_librarian %}
       <div role="group">
-        <h3>Administrator</h3>
+        <h3>Library</h3>
         <ul>
           <li>
             <a href="/admin/site-manual">
-              <span class="icon" data-icon="question-mark"></span>
+              {{ icon("question-mark") }}
               <span>Site Manual</span>
             </a>
           </li>
           <li>
             <a href="/admin/requests">
-              <span class="icon" data-icon="request-add"></span>
+              {{ icon("request-add") }}
               <span>Item Requests</span>
               {% if pending_requests_count > 0 %}
               <span style="background-color: #ff3f2d" class="ml-auto inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white rounded-full">{{ pending_requests_count }}</span>
@@ -158,34 +158,42 @@
           </li>
           <li>
             <a href="/admin/loans">
-              <span class="icon" data-icon="on-loan"></span>
+              {{ icon("on-loan") }}
               <span>Active Loans</span>
             </a>
           </li>
           <li>
             <a href="/admin/inventory">
-              <span class="icon" data-icon="edit"></span>
+              {{ icon("edit") }}
               <span>Manage Inventory</span>
             </a>
           </li>
           <li>
-            <a href="/admin/list">
-              <span class="icon" data-icon="shield"></span>
-              <span>Administrator List</span>
-            </a>
-          </li>
-          <li>
             <a href="/admin/directory">
-              <span class="icon" data-icon="directory"></span>
+              {{ icon("directory") }}
               <span>User List</span>
             </a>
           </li>
           <li>
             <a href="/admin/settings">
-              <span class="icon" data-icon="settings"></span>
+              {{ icon("settings") }}
               <span>Settings</span>
             </a>
           </li>
+          {% if user.is_admin %}
+          <li>
+            <a href="/admin/roles">
+              {{ icon("shield") }}
+              <span>Manage Roles</span>
+            </a>
+          </li>
+          <li>
+            <a href="/admin/audit">
+              {{ icon("clock-7") }}
+              <span>Audit Log</span>
+            </a>
+          </li>
+          {% endif %}
         </ul>
       </div>
       {% endif %}

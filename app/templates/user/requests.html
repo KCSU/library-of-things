@@ -22,7 +22,7 @@
         <tr>
           <td class="font-medium">{{ loop.index }}</td>
           <td class="text-ellipsis overflow-hidden">{{ req.item_title }}</td>
-          <td class="text-ellipsis overflow-hidden"><a href="{{ req.item_image_url }}" class="text-blue-500 hover:underline" target="_blank">Link</a></td>
+          <td class="text-ellipsis overflow-hidden">{% if req.item_image_src %}<a href="{{ req.item_image_src }}" class="text-blue-500 hover:underline" target="_blank">Link</a>{% endif %}</td>
           <td class="text-ellipsis overflow-hidden">{{ req.request_time }}</td>
         </tr>
       </tbody>

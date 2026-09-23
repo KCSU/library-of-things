@@ -2,7 +2,7 @@
 name = "library-of-things"
 version = "0.1.0"
 description = "KCSU Library of Things"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 dependencies = [
     "authlib==1.3.2",
     "cachetools==5.3.3",
@@ -13,13 +13,44 @@ dependencies = [
     "PyMySQL==1.1.1",
     "SQLAlchemy==2.0.44",
     "requests==2.32.4",
+    "pillow>=12.3.0",
 ]
 
 [dependency-groups]
 dev = [
     "pytest==8.2.0",
     "pytest-flask==1.3.0",
+    "ruff>=0.16.8",
+    "ty>=0.0.1a14",
 ]
 
 [tool.uv]
 package = false
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ANN", "Q"]
+ignore = ["ANN401"]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+docstring-quotes = "double"
+multiline-quotes = "double"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ANN"]
+"tools/**" = ["ANN"]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ty.src]
+include = ["app", "tools"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"

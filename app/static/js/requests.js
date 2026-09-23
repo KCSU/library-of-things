@@ -3,22 +3,9 @@ function acceptRequest(req) {
     return;
   }
 
-  fetch('/admin/api/accept_request', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: req.id })
-  })
-    .then(res => res.json())
-    .then(result => {
-      if (result.success) {
-        location.reload();
-      } else {
-        throw new Error(result.error || 'Failed to accept request');
-      }
-    })
-    .catch(err => {
-      alert('Error: ' + err.message);
-    });
+  post('/admin/api/accept_request', { id: req.id })
+    .then(() => location.reload())
+    .catch(err => alert('Error: ' + err.message));
 }
 
 function refuseRequest(req) {
@@ -27,20 +14,34 @@ function refuseRequest(req) {
     return; // Must give a reason to refuse
   }
 
-  fetch('/admin/api/refuse_request', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: req.id, reason: reason })
-  })
-    .then(res => res.json())
-    .then(result => {
-      if (result.success) {
-        location.reload();
-      } else {
-        alert('Error: ' + (result.error || 'Unknown error'));
-      }
-    })
-    .catch(err => {
-      alert('Network error: ' + err.message);
-    });
+  post('/admin/api/refuse_request', { id: req.id, reason: reason })
+    .then(() => location.reload())
+    .catch(err => alert('Error: ' + err.message));
 }
+
+function toggleLendPanel() {
+  $('#lend-panel').toggleClass('hidden');
+}
+
+$(document).ready(function() {
+  $('#lend-form').on('submit', function(e) {
+    e.preventDefault();
+
+    const crsid = $('#lend-crsid').val().trim().toLowerCase();
+    if (!crsid) {
+      alert('Enter the borrower\'s CRSid.');
+      return;
+    }
+
+    post('/admin/api/lend', {
+      item_id: $('#lend-item').val(),
+      crsid: crsid,
+      start_time: $('#lend-start').val() || null
+    })
+      .then(result => {
+        alert('Loan recorded for ' + result.borrower + '.');
+        location.reload();
+      })
+      .catch(err => alert('Error: ' + err.message));
+  });
+});

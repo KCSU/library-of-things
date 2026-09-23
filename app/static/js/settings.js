@@ -14,22 +14,13 @@ $(document).ready(function() {
       read_only: $('#read-only-toggle').prop('checked')
     };
     
-    fetch('/admin/api/update_settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    })
-      .then(res => res.json())
-      .then(result => {
-        if (result.success) {
-          alert('Settings saved successfully!');
-        } else {
-          alert('Error: ' + (result.error || 'Unknown error'));
-        }
-      })
-      .catch(err => {
-        alert('Network error: ' + err.message);
-      });
+    if (!confirm(`Are you sure you want to update the site settings?`)) {
+      return;
+    }
+
+    post('/admin/api/update_settings', data)
+      .then(() => alert('Settings saved successfully!'))
+      .catch(err => alert('Error: ' + err.message));
   });
 });
 

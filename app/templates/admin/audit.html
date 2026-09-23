@@ -1,0 +1,41 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="container mx-auto p-2 md:px-6 lg:px-16">
+  <header class="mb-6">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">Audit Log</h2>
+    <p class="text-gray-300">
+      A read-only audit trail of the system. Only visible to administrators.
+    </p>
+  </header>
+
+  {% if entries %}
+  <div class="overflow-x-auto">
+    <table class="table table-fixed w-full text-sm">
+      <thead>
+        <tr>
+          <th class="w-48 font-semibold">When</th>
+          <th class="w-32 font-semibold">Who</th>
+          <th class="font-semibold">What</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr>
+          <td class="text-gray-600">{{ entry.when }}</td>
+          <td class="font-medium">{{ entry.actor }}</td>
+          <td class="text-ellipsis overflow-hidden">{{ entry.message }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="text-gray-600 text-sm mt-2">
+    Showing the most recent {{ entries|length }} of at most {{ limit }} entries.
+  </div>
+  {% else %}
+  <p class="text-gray-500">Nothing has been logged yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

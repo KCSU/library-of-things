@@ -2,26 +2,63 @@
 {% block content %}
 
 <div class="container mx-auto p-2 md:px-6 lg:px-16">
-  <table class="table table-fixed w-full" id="users-table">
-    <thead>
-      <tr>
-        <th class="w-8 font-semibold">CRSid</th>
-        <th class="w-32 font-semibold">Display Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in users %}
-      <tr class="user-row">
-        <td class="font-medium">{{ user.crsid }}</td>
-        <td>{{ user.name }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  
+  <header class="mb-6">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">User List</h2>
+    <p class="text-gray-300">The complete list of users that can access the system.</p>
+  </header>
+
+  <form class="form grid gap-2 mb-6" onsubmit="return false">
+    <label for="user-search">Search</label>
+    <input id="user-search" type="search" autocomplete="off"
+      placeholder="CRSid, name or group" autocapitalize="none"
+      autocorrect="off" spellcheck="false">
+  </form>
+
+  <div class="overflow-x-auto">
+    <table class="table table-fixed w-full" id="users-table">
+      <thead>
+        <tr>
+          <th class="w-24 font-semibold">CRSid</th>
+          <th class="w-36 font-semibold">Display Name</th>
+          <th class="w-32 font-semibold">Group</th>
+          <th class="w-24 font-semibold">Account Enabled</th>
+          {% if can_edit %}
+          <th class="w-24 font-semibold">Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in users %}
+        <tr class="user-row"
+          data-search="{{ (row.crsid ~ ' ' ~ row.name ~ ' ' ~ row.group) | lower }}"
+          data-crsid="{{ row.crsid }}">
+          <td class="font-medium">{{ row.crsid }}</td>
+          <td class="text-ellipsis overflow-hidden">{{ row.name }}</td>
+          <td class="text-ellipsis overflow-hidden">{{ row.group }}</td>
+          <td>{{ 'Yes' if row.user_enabled else 'No' }}</td>
+          {% if can_edit %}
+          <td>
+            {% if row.crsid == user.crsid %}
+            <span class="text-gray-500 text-sm">That's you</span>
+            {% else %}
+            <button class="btn {{ 'btn-secondary' if row.user_enabled else 'btn-primary' }} text-sm toggle-enabled"
+              data-crsid="{{ row.crsid }}"
+              data-enable="{{ 'false' if row.user_enabled else 'true' }}">
+              {{ 'Disable' if row.user_enabled else 'Enable' }}
+            </button>
+            {% endif %}
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
   <div class="flex flex-col md:flex-row justify-between items-center mt-4 text-sm gap-4">
     <div class="text-gray-600">
-      Showing <span id="start-item">1</span> to <span id="end-item">50</span> of <span id="total-items">{{ users|length }}</span> users
+      Showing <span id="start-item">0</span> to <span id="end-item">0</span> of
+      <span id="total-items">0</span> users
     </div>
     <div class="flex gap-2 items-center max-md:pb-4">
       <button id="prev-btn" class="btn btn-secondary" onclick="changePage(-1)" disabled>Previous</button>
@@ -31,56 +68,12 @@
   </div>
 
   <div class="text-gray-600 text-sm mt-2">
-    If you wish to modify this list, please contact <a href="mailto:computing@kcsu.org.uk" class="hover:underline">computing@kcsu.org.uk</a> for now!
+    {% if not can_edit %}
+    Enabling and disabling accounts needs administrator access.
+    {% endif %}
   </div>
 </div>
 
-<script>
-const ITEMS_PER_PAGE = 10;
-let currentPage = 1;
-let totalPages = 1;
-
-function initPagination() {
-  const $rows = $('.user-row');
-  const totalItems = $rows.length;
-  totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-  
-  $('#total-items').text(totalItems);
-  $('#total-pages').text(totalPages);
-  
-  showPage(1);
-}
-
-function showPage(page) {
-  const $rows = $('.user-row');
-  const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  
-  // Hide all rows and show current page rows
-  $rows.hide().slice(startIndex, endIndex).show();
-  
-  // Update pagination info
-  const actualEndIndex = Math.min(endIndex, $rows.length);
-  $('#start-item').text($rows.length > 0 ? startIndex + 1 : 0);
-  $('#end-item').text(actualEndIndex);
-  $('#current-page').text(page);
-  
-  // Update button states
-  $('#prev-btn').prop('disabled', page === 1);
-  $('#next-btn').prop('disabled', page === totalPages);
-  
-  currentPage = page;
-}
-
-function changePage(direction) {
-  const newPage = currentPage + direction;
-  if (newPage >= 1 && newPage <= totalPages) {
-    showPage(newPage);
-  }
-}
-
-// Initialize pagination when page loads
-$(document).ready(initPagination);
-</script>
+<script src="{{ url_for('static', filename='js/directory.js') }}"></script>
 
 {% endblock %}

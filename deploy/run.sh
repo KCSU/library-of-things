@@ -2,11 +2,20 @@
 
 APP_DIR="/societies/kcsu/public_html/library-of-things"
 
-# Activate Python virtual environment
-. "$APP_DIR/venv/bin/activate"
-
-# Run the app with gunicorn
-# Using 8 workers and binding to a UNIX socket
+# Activate Python virtual environment.
 cd "$APP_DIR"
-exec gunicorn -w 8 -b "unix:$APP_DIR/web.sock" \
-    --umask=0007 --log-file - run:app
+. ".venv/bin/activate"
+
+# Nightly Lookup sync.
+mkdir -p "$APP_DIR/logs"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+flask --app app.run sync-users --daily >> "$APP_DIR/logs/sync-$STAMP.log" 2>&1 &
+SCHEDULER_PID=$!
+echo "Lookup sync scheduler started (pid $SCHEDULER_PID)"
+
+# Stop the scheduler whenever gunicorn stops.
+trap 'kill "$SCHEDULER_PID" 2>/dev/null || true' EXIT INT TERM
+
+# Run the app with gunicorn.
+gunicorn -w 2 -b "unix:$APP_DIR/web.sock" \
+    --umask=0007 --log-file "$APP_DIR/logs/gunicorn-$STAMP.log" app.run:app

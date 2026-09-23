@@ -50,12 +50,6 @@ function initLightbox() {
 $(document).ready(() => {
   initLightbox();
 
-  // lazy icon loading
-  $('span.icon').each((_, el) => {
-    const iconName = $(el).data('icon');
-    $(el).load("/static/icons/" + iconName + ".svg");
-  });
-
   // auto-collapse sidebar on mobile (< md breakpoint: 768px)
   function handleSidebarResize() {
     const $sidebar = $('.sidebar');
@@ -75,6 +69,14 @@ function signOut() {
   auth2.signOut();
 }
 
+function revealOverlay() {
+  const overlay = $('.overlay');
+  overlay.removeClass('hidden');
+  overlay[0].offsetHeight; // Force reflow
+  overlay.removeClass('opacity-0').addClass('opacity-100');
+  $('body').css('overflow', 'hidden'); // Prevent background scrolling
+}
+
 function dismissOverlay() {
   const overlay = $('.overlay');
   overlay.removeClass('opacity-100').addClass('opacity-0');
@@ -83,4 +85,21 @@ function dismissOverlay() {
   }, 300); // Match transition duration
 
   $('body').css('overflow', ''); // Re-enable background scrolling
+}
+
+function post(url, body) {
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body)
+  })
+    .then(res => res.json().catch(() => ({})).then(result => ({ res, result })))
+    .then(({ res, result }) => {
+      if (!res.ok || !result.success) {
+        const error = new Error(result.error || 'Unknown error');
+        error.status = res.status;
+        throw error;
+      }
+      return result;
+    });
 }

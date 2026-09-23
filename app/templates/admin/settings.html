@@ -4,7 +4,7 @@
 <div class="container mx-auto p-2 md:px-6 lg:px-16">
   <header class="mb-10">
     <h2 class="text-2xl font-semibold tracking-tight mb-2">Site Settings</h2>
-    <p class="text-[1.05rem] text-gray-300">Miscellaneous website configurations.</p>
+    <p class="text-[1.05rem] text-gray-300">Critical service configurations.</p>
   </header>
   
   <form class="form grid gap-6" id="settings-form">
@@ -13,16 +13,17 @@
 
       <div class="grid gap-2">
         <label class="text-current" for="announcement-text">Announcement text</label>
-        <textarea id="announcement-text" class="text-sm" rows="3" placeholder="Enter your message here...">{{ announcement.text if announcement else '' }}</textarea>
+        <textarea id="announcement-text" class="text-sm" rows="3" placeholder="Enter your message here..."
+          {{ 'disabled' if not can_edit }}>{{ announcement.text if announcement else '' }}</textarea>
         <p class="text-gray-500 text-sm" id="announcement-text-caption">If enabled, this message will be displayed to all users on the homepage.</p>
       </div>
       
       <div class="gap-2 flex flex-row items-start justify-between rounded-lg border p-4 shadow-xs">
         <div class="flex flex-col gap-0.5">
           <label for="announcement-toggle" class="leading-normal">Enable announcement banner</label>
-          <p class="text-muted-foreground text-sm">Display an announcement at the top of the homepage.</p>
+          <p class="text-gray-500 text-sm">Display an announcement at the top of the homepage.</p>
         </div>
-        <input type="checkbox" id="announcement-toggle" role="switch" onchange="toggleAnnouncementText()" {{ 'checked' if announcement and announcement.enabled else '' }}>
+        <input type="checkbox" id="announcement-toggle" role="switch" onchange="toggleAnnouncementText()" {{ 'checked' if announcement and announcement.enabled else '' }} {{ 'disabled' if not can_edit }}>
       </div>
     </section>
 
@@ -32,13 +33,20 @@
       <div class="gap-2 flex flex-row items-start justify-between rounded-lg border p-4 shadow-xs border-[#f8514966]">
         <div class="flex flex-col gap-0.5">
           <label for="read-only-toggle" class="leading-normal">Read-only mode</label>
-          <p class="text-muted-foreground text-sm">Prevent all users from interacting with the website, e.g.: submitting item requests.</p>
+          <p class="text-gray-500 text-sm">Prevent all users from interacting with the website, e.g.: submitting item requests.</p>
         </div>
-        <input type="checkbox" class="switch-destructive" id="read-only-toggle" role="switch" onchange="toggleReadOnlyMode()" {{ 'checked' if read_only else '' }}>
+        <input type="checkbox" class="switch-destructive" id="read-only-toggle" role="switch" {{ 'checked' if read_only else '' }} {{ 'disabled' if not can_edit }}>
       </div>
     </section>
 
+    {% if can_edit %}
     <button type="submit" class="btn w-fit px-8">Save Settings</button>
+    {% else %}
+    <p class="text-gray-500 text-sm">
+      These settings are shown for reference.
+      Changing them needs administrator access.
+    </p>
+    {% endif %}
   </form>
 </div>
 

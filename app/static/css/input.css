@@ -63,3 +63,22 @@ span.icon {
 /* .badge, .badge-primary, .badge-secondary, .badge-destructive, .badge-outline {
   overflow: visible;
 } */
+
+#item-image::file-selector-button {
+  height: calc(100% + var(--spacing) * 2);
+  margin-block: calc(var(--spacing) * -1);
+  margin-inline: calc(var(--spacing) * -3) calc(var(--spacing) * 4);
+  padding-inline: calc(var(--spacing) * 4);
+  border: 0;
+  border-radius: calc(var(--radius-md) - 1px) 0 0
+                  calc(var(--radius-md) - 1px);
+  background: var(--primary, #fafafa);
+  color: var(--primary-foreground, #0a0a0a);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#item-image::file-selector-button:hover {
+  opacity: 0.9;
+}

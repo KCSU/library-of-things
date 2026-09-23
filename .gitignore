@@ -224,3 +224,8 @@ static/css/output.css
 # Miscellaneous
 .DS_Store
 .trunk
+
+# Database dumps
+*.sql
+*.sql.gz
+*.sql.zip

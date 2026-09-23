@@ -1,0 +1,78 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<div class="container mx-auto p-2 md:px-6 lg:px-16">
+  <header class="mb-10">
+    <h2 class="text-2xl font-semibold tracking-tight mb-2">Roles</h2>
+    <p class="text-[1.05rem] text-gray-300">
+      Librarians can manage items, loans and requests. Administrators have unlimited
+      access to the system.
+    </p>
+  </header>
+
+  <section class="grid gap-4 mb-10">
+    <h3 class="text-lg font-medium">Grant access</h3>
+    <form class="form flex flex-wrap items-end gap-3" id="grant-form">
+      <div class="grid gap-2">
+        <label for="grant-crsid">CRSid</label>
+        <input id="grant-crsid" type="text" placeholder="abc123" required
+          autocapitalize="none" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="grid gap-2">
+        <label for="grant-role">Role</label>
+        <select id="grant-role">
+          {% for role in grantable %}
+          <option value="{{ role.value }}">{{ role.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn px-6">Grant</button>
+    </form>
+    <p class="text-gray-500 text-sm">
+      The person must already be a user before a role can be given to them.
+    </p>
+  </section>
+
+  <section class="grid gap-4">
+    <h3 class="text-lg font-medium">Current staff</h3>
+    {% if staff %}
+    <table class="table table-fixed w-full">
+      <thead>
+        <tr>
+          <th class="w-24 font-semibold">CRSid</th>
+          <th class="w-36 font-semibold">Display Name</th>
+          <th class="w-24 font-semibold">Role</th>
+          <th class="w-32 font-semibold">Change to</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in staff %}
+        <tr>
+          <td class="font-medium">{{ member.crsid }}</td>
+          <td>{{ member.name }}</td>
+          <td>{{ member.role_label }}</td>
+          <td>
+            {% if member.crsid == user.crsid %}
+            <span class="text-gray-500 text-sm">That's you</span>
+            {% else %}
+            <select class="role-select" data-crsid="{{ member.crsid }}">
+              {% for role in all_roles %}
+              <option value="{{ role.value }}"
+                {{ 'selected' if role.value == member.role }}>{{ role.label }}</option>
+              {% endfor %}
+            </select>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-gray-500">Nobody holds an admin role.</p>
+    {% endif %}
+  </section>
+</div>
+
+<script src="{{ url_for('static', filename='js/roles.js') }}"></script>
+
+{% endblock %}

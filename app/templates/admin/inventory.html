@@ -3,7 +3,7 @@
 
 <div class="fixed top-0 left-0 w-full h-full z-99 bg-black/30 backdrop-blur-sm cursor-pointer transition-opacity duration-300 overlay hidden opacity-0" id="confirm-overlay" onclick="dismissOverlay()">
   <div class="flex items-center justify-center h-full w-full">
-    <div class="card w-[90%] md:max-w-xl mb-5 border-[oklch(1 0 0/25%)] border cursor-default max-h-5/6 overflow-scroll" onclick="event.stopPropagation()">
+    <div class="card w-[90%] md:max-w-xl mb-5 border cursor-default max-h-5/6 overflow-scroll" onclick="event.stopPropagation()">
       <header class="edit-item-contents">
         <h2>Edit Item</h2>
         <p>Edit the details of the selected item.</p>
@@ -32,8 +32,13 @@
           </div>
 
           <div class="grid gap-2">
-            <label for="item-image">Image URL *</label>
-            <input type="url" id="item-image" placeholder="https://example.com/image.jpg" required>
+            <label for="item-image">Image</label>
+            <img id="item-image-preview" alt="Current image" hidden
+                 class="aspect-video object-cover rounded max-h-44 w-full">
+            <input type="file" id="item-image" accept="image/*">
+            <span class="text-sm text-gray-400">
+              Converted to WebP automatically. Max 8MB.
+            </span>
           </div>
 
           <div class="grid gap-2">
@@ -46,13 +51,27 @@
           </div>
 
           <div class="grid gap-2">
-            <label for="item-loan-policy">Loan Policy *</label>
-            <select id="item-loan-policy" required>
-              <option value="seven_days">Short (7 days)</option>
-              <option value="thirty_days">Medium (30 days)</option>
-              <option value="academic_year_end">Long (End of academic year)</option>
-              <option value="permanent">Permanent</option>
+            <label for="item-loan-mode">Lending terms *</label>
+            <select id="item-loan-mode" required onchange="updateLoanModeFields()">
+              <option value="duration">Borrow for a fixed period</option>
+              <option value="end_date">Borrow until a date</option>
+              <option value="permanent">Give away (not returned)</option>
             </select>
+          </div>
+
+          <div class="grid gap-2" id="loan-duration-field">
+            <label for="item-loan-duration">Days *</label>
+            <input type="number" id="item-loan-duration" min="1" value="7"
+                   placeholder="7">
+          </div>
+
+          <div class="grid gap-2" id="loan-end-date-field" hidden>
+            <label for="item-loan-end-date">Return by *</label>
+            <input type="date" id="item-loan-end-date">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="item-loan-recurs">
+              Repeat this date every year
+            </label>
           </div>
 
           <div class="grid gap-2">
@@ -116,10 +135,13 @@
 </div>
 
 <div class="container mx-auto p-2 md:px-6 lg:px-16">
-  <header class="mb-10">
-    <h2 class="text-2xl font-semibold tracking-tight mb-2">Manage Inventory</h2>
-    <p class="text-[1.05rem] text-gray-300">All items in the inventory are listed here. Add, edit or delete items as needed.</p>
-  </header>
+  <div class="flex items-end justify-between gap-4 mb-6">
+    <header>
+      <h2 class="text-2xl font-semibold tracking-tight mb-2">Manage Inventory</h2>
+      <p class="text-[1.05rem] text-gray-300">All items in the inventory are listed here. Add, edit or delete items as needed.</p>
+    </header>
+    <button onclick="showOverlay({})" class="btn w-fit">Add New Item</button>
+  </div>
   <div class="overflow-x-auto">
     <table class="table w-full">
       <thead>
@@ -145,19 +167,11 @@
           {% else %}
           <td class="text-ellipsis overflow-hidden text-gray-500">(unknown)</td>
           {% endif %}
-          <td><a class="hover:underline text-blue-500" target="_blank" href="{{ item.image_url }}">Link</a></td>
+          <td>{% if item.image_src %}<a class="hover:underline text-blue-500" target="_blank" href="{{ item.image_src }}">Link</a>{% endif %}</td>
           <td>{{ item.category }}</td>
           <td>{{ item.count }}</td>
           <td>
-            {% if item.loan_policy == "seven_days" %}
-            Short (7d)
-            {% elif item.loan_policy == "thirty_days" %}
-            Medium (30d)
-            {% elif item.loan_policy == "academic_year_end" %}
-            Long (Year End)
-            {% elif item.loan_policy == "permanent" %}
-            Permanent
-            {% endif %}
+            {{ item.loan_terms }}
           </td>
           <td>{% if item.visible %}Yes{% else %}No{% endif %}</td>
           <td>
@@ -168,7 +182,6 @@
       {% endfor %}
     </table>
   </div>
-  <button onclick="showOverlay({})" class="btn btn-secondary mt-2">Add New Item</button>
 </div>
 
 <script src="{{ url_for('static', filename='js/inventory.js') }}"></script>

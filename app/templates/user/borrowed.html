@@ -23,12 +23,12 @@
         <tr>
           <td class="font-medium">{{ loop.index }}</td>
           <td class="text-ellipsis overflow-hidden">{{ loan.item_title }}</td>
-          <td><a class="hover:underline text-blue-500" target="_blank" href="{{ loan.item_image_url }}">Link</a></td>
+          <td>{% if loan.item_image_src %}<a class="hover:underline text-blue-500" target="_blank" href="{{ loan.item_image_src }}">Link</a>{% endif %}</td>
           <td>{{ loan.start_time }}</td>
           <td>
             {% if loan.is_overdue %}
             <div style="color: oklch(.704 .191 22.216)" data-tooltip="This item is overdue! Return it as soon as possible." data-side="top" data-align="center">
-              <span class="inline-block icon w-4!" data-icon="warning"></span>
+              {{ icon("warning", "inline-block icon w-4!") }}
               {{ loan.due_date }}
             </div>
             {% else %}
