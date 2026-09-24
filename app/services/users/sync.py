@@ -25,8 +25,13 @@ class SyncReport:
 
     @property
     def changed(self) -> bool:
-        return bool(self.created or self.reenabled or self.disabled
-                    or self.moved or self.renamed)
+        return bool(
+            self.created
+            or self.reenabled
+            or self.disabled
+            or self.moved
+            or self.renamed
+        )
 
     def summary(self) -> str:
         return (
@@ -80,9 +85,16 @@ def sync_users(client: LookupClient, dry_run: bool = False) -> SyncReport:
             if user is None:
                 report.created.append(crsid)
                 if not dry_run:
-                    session.add(User(crsid=crsid, name=person.name,
-                                     group_id=group.id, role=Role.USER,
-                                     user_enabled=True, is_manual=False))
+                    session.add(
+                        User(
+                            crsid=crsid,
+                            name=person.name,
+                            group_id=group.id,
+                            role=Role.USER,
+                            user_enabled=True,
+                            is_manual=False,
+                        )
+                    )
                 continue
 
             if not user.user_enabled:
@@ -97,8 +109,11 @@ def sync_users(client: LookupClient, dry_run: bool = False) -> SyncReport:
                 report.renamed.append(crsid)
                 if not dry_run:
                     user.name = person.name
-            if (crsid not in report.reenabled and crsid not in report.moved
-                    and crsid not in report.renamed):
+            if (
+                crsid not in report.reenabled
+                and crsid not in report.moved
+                and crsid not in report.renamed
+            ):
                 report.unchanged += 1
 
         # Anyone Lookup no longer lists should lose access.
@@ -117,6 +132,7 @@ def sync_users(client: LookupClient, dry_run: bool = False) -> SyncReport:
         if report.changed and not dry_run:
             session.add(Audit(message=f'[lookup sync] {report.summary()}'))
 
-    logger.info('Lookup sync %s: %s',
-                '(dry run)' if dry_run else 'applied', report.summary())
+    logger.info(
+        'Lookup sync %s: %s', '(dry run)' if dry_run else 'applied', report.summary()
+    )
     return report

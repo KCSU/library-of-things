@@ -17,15 +17,14 @@ if TYPE_CHECKING:
 class Group(BaseModel):
     __tablename__ = 'groups'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True,
-                                          default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     display_name: Mapped[str] = mapped_column(String(255), nullable=False)
     # Comma-separated Lookup identifiers.
     lookup_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     # Either 'group' or 'inst'.
-    lookup_type: Mapped[str | None] = mapped_column(String(8), nullable=True,
-                                                    default='group')
+    lookup_type: Mapped[str | None] = mapped_column(
+        String(8), nullable=True, default='group'
+    )
 
     users: Mapped[list[User]] = relationship(back_populates='group')
-

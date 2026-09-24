@@ -12,7 +12,6 @@ from app.models import Item, ItemImage
 logger = logging.getLogger(__name__)
 
 
-
 @log_slow
 def store(item_id: uuid.UUID, raw: bytes) -> dict[str, Any] | None:
     """Normalise and save an image, replacing any existing one.
@@ -27,8 +26,7 @@ def store(item_id: uuid.UUID, raw: bytes) -> dict[str, Any] | None:
         if item is None:
             return None
 
-        image = (session.query(ItemImage)
-                 .filter(ItemImage.item_id == item_id).first())
+        image = session.query(ItemImage).filter(ItemImage.item_id == item_id).first()
         if image is None:
             image = ItemImage(item_id=item_id)
             session.add(image)
@@ -52,8 +50,7 @@ def store(item_id: uuid.UUID, raw: bytes) -> dict[str, Any] | None:
 def fetch(item_id: uuid.UUID) -> tuple[bytes, str] | None:
     """Return (content, checksum) for an item's image."""
     with db_session() as session:
-        image = (session.query(ItemImage)
-                 .filter(ItemImage.item_id == item_id).first())
+        image = session.query(ItemImage).filter(ItemImage.item_id == item_id).first()
         if image is None:
             return None
         return image.content, image.checksum
@@ -62,6 +59,5 @@ def fetch(item_id: uuid.UUID) -> tuple[bytes, str] | None:
 def delete(item_id: uuid.UUID) -> bool:
     with db_session() as session:
         return bool(
-            session.query(ItemImage)
-            .filter(ItemImage.item_id == item_id).delete()
+            session.query(ItemImage).filter(ItemImage.item_id == item_id).delete()
         )

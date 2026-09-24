@@ -22,26 +22,24 @@ if TYPE_CHECKING:
 class Item(BaseModel):
     __tablename__ = 'items'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True,
-                                          default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
     display_id: Mapped[str] = mapped_column(String(255), nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(2047), nullable=False)
     category_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('categories.id'), nullable=False)
+        UUIDBinary, ForeignKey('categories.id'), nullable=False
+    )
 
     # A set duration from the borrowing date, or a fixed calendar end date.
     # If neither set, item is given away rather than lent.
-    loan_duration_days: Mapped[int | None] = mapped_column(Integer,
-                                                           nullable=True)
-    loan_end_date: Mapped[datetime.date | None] = mapped_column(Date,
-                                                                nullable=True)
-    loan_end_recurs_annually: Mapped[bool] = mapped_column(Boolean,
-                                                           nullable=False,
-                                                           default=False)
+    loan_duration_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    loan_end_date: Mapped[datetime.date | None] = mapped_column(Date, nullable=True)
+    loan_end_recurs_annually: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
 
     # Whether item is visible to a normal user.
-    visible: Mapped[bool] = mapped_column(Boolean, nullable=False,default=True)
+    visible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     count: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     location: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
@@ -54,7 +52,8 @@ class Item(BaseModel):
 
     # Each item may have an image.
     image: Mapped[ItemImage | None] = relationship(
-        back_populates='item', uselist=False, cascade='all, delete-orphan')
+        back_populates='item', uselist=False, cascade='all, delete-orphan'
+    )
 
     @property
     def is_permanent(self) -> bool:
@@ -68,9 +67,7 @@ class Item(BaseModel):
     @property
     def available_count(self) -> int:
         """Copies neither out on loan, nor being waited on by a pending request."""
-        return max(
-            0, self.count - self.outstanding_loans_count - len(self.requests)
-        )
+        return max(0, self.count - self.outstanding_loans_count - len(self.requests))
 
     @property
     def has_image(self) -> bool:
@@ -120,8 +117,9 @@ class Item(BaseModel):
         return None  # no due date
 
 
-def _next_occurrence(anniversary: datetime.date,
-                     on_or_after: datetime.date) -> datetime.date:
+def _next_occurrence(
+    anniversary: datetime.date, on_or_after: datetime.date
+) -> datetime.date:
     """The next time this month/day comes round, at or after a given date."""
     for year in (on_or_after.year, on_or_after.year + 1):
         try:

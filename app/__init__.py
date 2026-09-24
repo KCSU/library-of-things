@@ -59,16 +59,13 @@ _ERROR_PAGES = {400: 'Bad request', 404: 'Not found'}
 
 def _configure_logging(root_path: str) -> None:
     """Log to stderr and to logs/app-<start>-<pid>.log in the project root."""
-    # Explicit flag rather than inspecting root's handlers: pytest installs
-    # its own FileHandler, and gunicorn may too.
     global _log_configured
     if _log_configured:
         return
     _log_configured = True
 
     # No-op if the host (e.g. gunicorn) has already configured handlers.
-    logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT,
-                        datefmt=_LOG_DATEFMT)
+    logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT, datefmt=_LOG_DATEFMT)
 
     log_dir = Path(root_path).parent / 'logs'
     log_dir.mkdir(exist_ok=True)
@@ -93,7 +90,8 @@ def create_app(config_name: str = 'production') -> Flask:
     app.config['DEBUG'] = config_name == 'development'
 
     app.wsgi_app = ProxyFix(  # ty: ignore[invalid-assignment]
-        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+    )
 
     try:
         init_database(MYSQL_DATABASE_URL)
@@ -150,7 +148,8 @@ def register_favicon_routes(app: Flask) -> None:
 
     for url, (filename, mimetype) in _FAVICON_ROUTES.items():
         app.add_url_rule(
-            url, endpoint='favicon_' + filename.replace('.', '_'),
+            url,
+            endpoint='favicon_' + filename.replace('.', '_'),
             view_func=partial(send, filename, mimetype),
         )
 
@@ -184,22 +183,29 @@ def register_blueprints(app: Flask) -> None:
     from app.services.settings.routes import settings_bp
     from app.services.users.routes import users_bp
 
-    for blueprint in (auth_bp, items_bp, loans_bp, images_bp, users_bp,
-                      settings_bp, admin_bp):
+    for blueprint in (
+        auth_bp,
+        items_bp,
+        loans_bp,
+        images_bp,
+        users_bp,
+        settings_bp,
+        admin_bp,
+    ):
         app.register_blueprint(blueprint)
 
 
 def register_error_handlers(app: Flask) -> None:
     def handler(code: int, message: str) -> Callable[[Exception], ResponseReturnValue]:
         def render(error: Exception) -> ResponseReturnValue:
-            wants_json = (
-                request.path.startswith('/admin/api/')
-                or (request.accept_mimetypes.accept_json
-                    and not request.accept_mimetypes.accept_html)
+            wants_json = request.path.startswith('/admin/api/') or (
+                request.accept_mimetypes.accept_json
+                and not request.accept_mimetypes.accept_html
             )
             if wants_json:
                 return {'error': message}, code
             return render_template(f'{code}.html', user=session.get('user')), code
+
         return render
 
     for code, message in _ERROR_PAGES.items():

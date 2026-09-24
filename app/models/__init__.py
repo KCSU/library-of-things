@@ -10,5 +10,16 @@ from app.models.loan import Loan, Request
 from app.models.setting import Setting
 from app.models.user import Role, User
 
-__all__ = ['Audit', 'Base', 'Category', 'Group', 'Item', 'ItemImage',
-           'Loan', 'Request', 'Role', 'Setting', 'User']
+__all__ = [
+    'Audit',
+    'Base',
+    'Category',
+    'Group',
+    'Item',
+    'ItemImage',
+    'Loan',
+    'Request',
+    'Role',
+    'Setting',
+    'User',
+]

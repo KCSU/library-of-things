@@ -21,11 +21,13 @@ if TYPE_CHECKING:
 class ItemImage(BaseModel):
     __tablename__ = 'item_images'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True,
-                                          default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
     item_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('items.id', ondelete='CASCADE'),
-        nullable=False, unique=True)
+        UUIDBinary,
+        ForeignKey('items.id', ondelete='CASCADE'),
+        nullable=False,
+        unique=True,
+    )
     content: Mapped[bytes] = mapped_column(MEDIUMBLOB, nullable=False)
     byte_size: Mapped[int] = mapped_column(Integer, nullable=False)
     width: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
@@ -33,7 +35,8 @@ class ItemImage(BaseModel):
 
     # sha256 hash of the content
     checksum: Mapped[str] = mapped_column(String(64), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False,
-                                                 default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.now
+    )
 
     item: Mapped[Item] = relationship(back_populates='image')

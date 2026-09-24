@@ -13,9 +13,7 @@ class UUIDBinary(TypeDecorator[uuid.UUID]):
     impl = BINARY(16)
     cache_ok = True
 
-    def process_bind_param(
-        self, value: Any, dialect: Dialect
-    ) -> bytes | None:
+    def process_bind_param(self, value: Any, dialect: Dialect) -> bytes | None:
         if value is None:
             return None
         if not isinstance(value, uuid.UUID):

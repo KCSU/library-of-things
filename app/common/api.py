@@ -20,6 +20,7 @@ def json_errors(f: View) -> View:
     Turn exceptions escaping a JSON endpoint into a JSON body.
     ValueError raises a 400, other errors surface as a 500.
     """
+
     @wraps(f)
     def wrapper(*args: Any, **kwargs: Any) -> ResponseReturnValue:
         try:
@@ -29,9 +30,9 @@ def json_errors(f: View) -> View:
         except ValueError as exc:
             return jsonify({'error': str(exc)}), 400
         except Exception:
-            logger.exception('Unhandled error in %s',
-                             getattr(f, '__name__', f))
+            logger.exception('Unhandled error in %s', getattr(f, '__name__', f))
             return jsonify({'error': 'Something went wrong'}), 500
+
     return wrapper
 
 

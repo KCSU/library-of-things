@@ -17,9 +17,9 @@ if TYPE_CHECKING:
 
 
 class Role(IntEnum):
-    USER = 10        # plain user
-    LIBRARIAN = 20   # + manage items, loans and requests, read settings
-    ADMIN = 30       # + everything else
+    USER = 10  # plain user
+    LIBRARIAN = 20  # + manage items, loans and requests, read settings
+    ADMIN = 30  # + everything else
 
     @property
     def label(self) -> str:
@@ -29,23 +29,21 @@ class Role(IntEnum):
 class User(BaseModel):
     __tablename__ = 'users'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True,
-                                          default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
     crsid: Mapped[str] = mapped_column(String(15), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     group_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('groups.id'), nullable=False)
-    role: Mapped[int] = mapped_column(SmallInteger, nullable=False,
-                                      default=Role.USER)
+        UUIDBinary, ForeignKey('groups.id'), nullable=False
+    )
+    role: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=Role.USER)
     # Cleared when Lookup stops listing the user. They can no longer sign in
     # but their loan history survives.
-    user_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False,
-                                               default=True)
+    user_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     # Hand-added users are invisible to Lookup and must survive a sync.
-    is_manual: Mapped[bool] = mapped_column(Boolean, nullable=False,
-                                            default=False)
+    is_manual: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     group: Mapped[Group] = relationship(back_populates='users')
     loans: Mapped[list[Loan]] = relationship(
-        foreign_keys='Loan.user_id', back_populates='user')
+        foreign_keys='Loan.user_id', back_populates='user'
+    )
     requests: Mapped[list[Request]] = relationship(back_populates='user')

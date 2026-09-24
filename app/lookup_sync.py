@@ -38,7 +38,8 @@ def sync_once(dry_run: bool) -> None:
         report = sync_users(client, dry_run=dry_run)
     except LookupError as exc:
         raise click.ClickException(
-            f'Lookup failed, nothing was written: {exc}') from exc
+            f'Lookup failed, nothing was written: {exc}'
+        ) from exc
 
     click.echo('DRY RUN - nothing written' if dry_run else 'Applied')
     click.echo(f'  {report.summary()}')
@@ -46,14 +47,19 @@ def sync_once(dry_run: bool) -> None:
 
 def register_cli(app: Flask) -> None:
     @app.cli.command('sync-users')
-    @click.option('--dry-run', is_flag=True,
-                  help='Report what would change, write nothing.')
-    @click.option('--daily', is_flag=True,
-                  help='Stay running and sync once a day.')
-    @click.option('--at', 'at_hour', default=3, show_default=True,
-                  metavar='HOUR', help='Hour of day (UTC) for --daily.')
-    def sync_users_command(dry_run: bool, daily: bool,
-                           at_hour: int) -> None:
+    @click.option(
+        '--dry-run', is_flag=True, help='Report what would change, write nothing.'
+    )
+    @click.option('--daily', is_flag=True, help='Stay running and sync once a day.')
+    @click.option(
+        '--at',
+        'at_hour',
+        default=3,
+        show_default=True,
+        metavar='HOUR',
+        help='Hour of day (UTC) for --daily.',
+    )
+    def sync_users_command(dry_run: bool, daily: bool, at_hour: int) -> None:
         """Reconcile the user table against the Cambridge Lookup directory."""
         if not daily:
             sync_once(dry_run)

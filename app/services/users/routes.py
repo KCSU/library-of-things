@@ -16,18 +16,24 @@ users_bp = Blueprint('users', __name__)
 @users_bp.route('/admin/directory')
 @role_required(Role.LIBRARIAN)
 def directory(user: dict[str, Any]) -> ResponseReturnValue:
-    return render_template('admin/directory.html',
-                           users=user_service.get_all_users(), user=user,
-                           can_edit=user['is_admin'])
+    return render_template(
+        'admin/directory.html',
+        users=user_service.get_all_users(),
+        user=user,
+        can_edit=user['is_admin'],
+    )
 
 
 @users_bp.route('/admin/roles')
 @role_required(Role.ADMIN)
 def roles(user: dict[str, Any]) -> ResponseReturnValue:
-    return render_template('admin/roles.html', user=user,
-                           staff=user_service.get_staff(),
-                           grantable=[Role.LIBRARIAN, Role.ADMIN],
-                           all_roles=list(Role))
+    return render_template(
+        'admin/roles.html',
+        user=user,
+        staff=user_service.get_staff(),
+        grantable=[Role.LIBRARIAN, Role.ADMIN],
+        all_roles=list(Role),
+    )
 
 
 @users_bp.route('/admin/api/set_role', methods=['POST'])
@@ -45,7 +51,7 @@ def api_set_role(user: dict[str, Any]) -> ResponseReturnValue:
         return jsonify({'error': 'A role is required'}), 400
     try:
         role = Role(int(raw_role))
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return jsonify({'error': f'Unknown role: {raw_role!r}'}), 400
 
     changed = user_service.set_role(crsid, role, acting_crsid=user['crsid'])
@@ -68,7 +74,7 @@ def api_set_user_enabled(user: dict[str, Any]) -> ResponseReturnValue:
     if not reason:
         return jsonify({'error': 'A reason is required'}), 400
 
-    changed = user_service.set_user_enabled(crsid, enabled,
-                                            acting_crsid=user['crsid'],
-                                            reason=reason)
+    changed = user_service.set_user_enabled(
+        crsid, enabled, acting_crsid=user['crsid'], reason=reason
+    )
     return jsonify({'success': True, **changed})

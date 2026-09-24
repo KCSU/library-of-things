@@ -5,11 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def required_from_env(key: str) -> str:
     value = os.getenv(key)
     if value is None:
         raise ValueError(f'Missing required environment variable: {key}')
     return value
+
 
 # Flask client-side session cookie signing key
 FLASK_SESSION_SECRET_KEY = required_from_env('FLASK_SESSION_SECRET_KEY')
@@ -21,8 +23,8 @@ MYSQL_USERNAME = required_from_env('MYSQL_USERNAME')
 MYSQL_PASSWORD = required_from_env('MYSQL_PASSWORD')
 MYSQL_DATABASE = required_from_env('MYSQL_DATABASE')
 MYSQL_DATABASE_URL = (
-    f"mysql+pymysql://{quote(MYSQL_USERNAME, safe='')}:"
-    f"{quote(MYSQL_PASSWORD, safe='')}"
+    f'mysql+pymysql://{quote(MYSQL_USERNAME, safe="")}:'
+    f'{quote(MYSQL_PASSWORD, safe="")}'
     f'@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
 )
 MYSQL_POOL_SIZE = 1

@@ -46,8 +46,9 @@ def encode(raw: bytes) -> WebPImageBytes:
     elif source.mode != 'RGB':
         source = source.convert('RGB')
 
-    source.thumbnail((IMAGE_MAX_DIMENSION, IMAGE_MAX_DIMENSION),
-                     Image.Resampling.LANCZOS)
+    source.thumbnail(
+        (IMAGE_MAX_DIMENSION, IMAGE_MAX_DIMENSION), Image.Resampling.LANCZOS
+    )
 
     buffer = io.BytesIO()
     source.save(buffer, format='WEBP', quality=IMAGE_QUALITY, method=6)

@@ -17,8 +17,7 @@ if TYPE_CHECKING:
 class Category(BaseModel):
     __tablename__ = 'categories'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True,
-                                          default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
     category: Mapped[str] = mapped_column(String(255), nullable=False)
 
     items: Mapped[list[Item]] = relationship(back_populates='category')

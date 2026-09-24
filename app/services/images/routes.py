@@ -17,9 +17,7 @@ images_bp = Blueprint('images', __name__)
 
 @images_bp.route('/admin/api/items/<uuid:item_id>/image', methods=['POST'])
 @role_required(Role.LIBRARIAN)
-def api_upload_item_image(
-    user: dict[str, Any], item_id: UUID
-) -> ResponseReturnValue:
+def api_upload_item_image(user: dict[str, Any], item_id: UUID) -> ResponseReturnValue:
     """Replace an item's image. Admin only."""
     try:
         content = file_service.read_upload(request.files.get('image'))
@@ -39,9 +37,7 @@ def api_upload_item_image(
 
 @images_bp.route('/admin/api/items/<uuid:item_id>/image', methods=['DELETE'])
 @role_required(Role.LIBRARIAN)
-def api_delete_item_image(
-    user: dict[str, Any], item_id: UUID
-) -> ResponseReturnValue:
+def api_delete_item_image(user: dict[str, Any], item_id: UUID) -> ResponseReturnValue:
     if not image_service.delete(item_id):
         return jsonify({'error': 'No image to remove'}), 404
     return jsonify({'success': True})
@@ -60,8 +56,12 @@ def item_image(user: dict[str, Any], item_id: UUID) -> ResponseReturnValue:
     if request.headers.get('If-None-Match') == etag:
         return Response(status=304, headers={'ETag': etag})
 
-    return Response(content, mimetype=IMAGE_CONTENT_TYPE, headers={
-        'ETag': etag,
-        'Cache-Control': 'public, max-age=31536000, immutable',
-        'Content-Length': str(len(content)),
-    })
+    return Response(
+        content,
+        mimetype=IMAGE_CONTENT_TYPE,
+        headers={
+            'ETag': etag,
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Content-Length': str(len(content)),
+        },
+    )

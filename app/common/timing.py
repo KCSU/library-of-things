@@ -26,6 +26,7 @@ def log_slow(arg: Callable[..., Any] | float = 1.0) -> Callable[..., Any]:
                 elapsed = time.perf_counter() - start
                 if elapsed >= threshold:
                     logger.info('%s took %.2fs', name, elapsed)
+
         return wrapper
 
     return decorator(arg) if callable(arg) else decorator

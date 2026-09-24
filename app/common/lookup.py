@@ -33,9 +33,13 @@ class LookupPerson:
 class LookupClient:
     """Reads group and institution membership from Lookup."""
 
-    def __init__(self, client_id: str | None = None,
-                 client_secret: str | None = None,
-                 base_url: str = LOOKUP_API_URL, timeout: int = 30) -> None:
+    def __init__(
+        self,
+        client_id: str | None = None,
+        client_secret: str | None = None,
+        base_url: str = LOOKUP_API_URL,
+        timeout: int = 30,
+    ) -> None:
         self.base_url = base_url.rstrip('/')
         self.client_id = client_id
         self.client_secret = client_secret
@@ -48,27 +52,31 @@ class LookupClient:
         if self._token and time.monotonic() < self._token_expires_at:
             return self._token
 
-        body = urllib.parse.urlencode({
-            'grant_type': 'client_credentials',
-            'scope': LOOKUP_SCOPE,
-        }).encode()
+        body = urllib.parse.urlencode(
+            {
+                'grant_type': 'client_credentials',
+                'scope': LOOKUP_SCOPE,
+            }
+        ).encode()
         basic = base64.b64encode(
             f'{self.client_id}:{self.client_secret}'.encode()
         ).decode()
-        request = urllib.request.Request(LOOKUP_TOKEN_URL, data=body, headers={
-            'Authorization': f'Basic {basic}',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json',
-        })
+        request = urllib.request.Request(
+            LOOKUP_TOKEN_URL,
+            data=body,
+            headers={
+                'Authorization': f'Basic {basic}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json',
+            },
+        )
 
         try:
             with urllib.request.urlopen(request, timeout=self.timeout) as response:
                 payload = json.loads(response.read().decode())
         except urllib.error.HTTPError as exc:
             if exc.code in (400, 401):
-                raise LookupError(
-                    'The API Gateway rejected the credentials.'
-                ) from exc
+                raise LookupError('The API Gateway rejected the credentials.') from exc
             raise LookupError(f'Token request failed: HTTP {exc.code}') from exc
         except urllib.error.URLError as exc:
             raise LookupError(f'Could not reach the API Gateway: {exc.reason}') from exc
@@ -80,15 +88,19 @@ class LookupClient:
         # Expire a minute early to avoid straddling the boundary.
         self._token = token
         self._token_expires_at = time.monotonic() + max(
-            0, int(payload.get('expires_in', 3600)) - 60)
+            0, int(payload.get('expires_in', 3600)) - 60
+        )
         return token
 
     def _get(self, path: str) -> dict[str, Any]:
         url = f'{self.base_url}/{path.lstrip("/")}'
-        request = urllib.request.Request(url, headers={
-            'Authorization': f'Bearer {self._access_token()}',
-            'Accept': 'application/json',
-        })
+        request = urllib.request.Request(
+            url,
+            headers={
+                'Authorization': f'Bearer {self._access_token()}',
+                'Accept': 'application/json',
+            },
+        )
         try:
             with urllib.request.urlopen(request, timeout=self.timeout) as response:
                 return json.loads(response.read().decode())
@@ -127,15 +139,21 @@ class LookupClient:
         return people
 
     @log_slow(5.0)
-    def members(self, lookup_name: str,
-                lookup_type: str = 'group') -> list[LookupPerson]:
+    def members(
+        self, lookup_name: str, lookup_type: str = 'group'
+    ) -> list[LookupPerson]:
         """Members of a Lookup group or institution."""
         # TODO(khm39): this should probably be an enum
         if lookup_type not in ('group', 'inst'):
             raise ValueError(
-                f"lookup_type must be 'group' or 'inst', got {lookup_type!r}")
+                f"lookup_type must be 'group' or 'inst', got {lookup_type!r}"
+            )
         payload = self._get(f'{lookup_type}/{lookup_name}/members')
         people = self._parse(payload)
-        logger.info('Lookup %s/%s returned %d current members',
-                    lookup_type, lookup_name, len(people))
+        logger.info(
+            'Lookup %s/%s returned %d current members',
+            lookup_type,
+            lookup_name,
+            len(people),
+        )
         return people

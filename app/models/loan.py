@@ -22,30 +22,30 @@ _TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 class Loan(BaseModel):
     __tablename__ = 'loans'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True,
-                                          default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
     item_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('items.id'), nullable=False)
+        UUIDBinary, ForeignKey('items.id'), nullable=False
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('users.id'), nullable=False)
+        UUIDBinary, ForeignKey('users.id'), nullable=False
+    )
 
     start_time: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, server_default=func.now())
+        DateTime, nullable=False, server_default=func.now()
+    )
 
     # None if item was given away rather than lent.
     due_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    returned_at: Mapped[datetime | None] = mapped_column(DateTime,
-                                                         nullable=True)
+    returned_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Admin ID if created manually by an admin, None otherwise.
     created_by_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUIDBinary, ForeignKey('users.id'), nullable=True)
+        UUIDBinary, ForeignKey('users.id'), nullable=True
+    )
 
     item: Mapped[Item] = relationship(back_populates='loans')
-    user: Mapped[User] = relationship(foreign_keys=[user_id],
-                                      back_populates='loans')
-    created_by: Mapped[User | None] = relationship(
-        foreign_keys=[created_by_id])
+    user: Mapped[User] = relationship(foreign_keys=[user_id], back_populates='loans')
+    created_by: Mapped[User | None] = relationship(foreign_keys=[created_by_id])
 
     @property
     def is_returned(self) -> bool:
@@ -60,10 +60,14 @@ class Loan(BaseModel):
     def to_dict(self) -> dict[str, Any]:
         return super().to_dict() | {
             'start_time': self.start_time.strftime(_TIMESTAMP_FORMAT),
-            'due_date': (self.due_date.strftime(_TIMESTAMP_FORMAT)
-                         if self.due_date else None),
-            'returned_at': (self.returned_at.strftime(_TIMESTAMP_FORMAT)
-                            if self.returned_at else None),
+            'due_date': (
+                self.due_date.strftime(_TIMESTAMP_FORMAT) if self.due_date else None
+            ),
+            'returned_at': (
+                self.returned_at.strftime(_TIMESTAMP_FORMAT)
+                if self.returned_at
+                else None
+            ),
             'is_overdue': self.is_overdue,
             'is_returned': self.is_returned,
             'created_by': self.created_by.name if self.created_by else None,
@@ -78,14 +82,16 @@ class Loan(BaseModel):
 class Request(BaseModel):
     __tablename__ = 'requests'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True,
-                                          default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
     item_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('items.id'), nullable=False)
+        UUIDBinary, ForeignKey('items.id'), nullable=False
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('users.id'), nullable=False)
+        UUIDBinary, ForeignKey('users.id'), nullable=False
+    )
     request_time: Mapped[datetime] = mapped_column(
-        TIMESTAMP, nullable=False, server_default=func.now())
+        TIMESTAMP, nullable=False, server_default=func.now()
+    )
 
     item: Mapped[Item] = relationship(back_populates='requests')
     user: Mapped[User] = relationship(back_populates='requests')

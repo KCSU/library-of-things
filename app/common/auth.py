@@ -28,6 +28,7 @@ def role_required(minimum: Role) -> Callable[[View], View]:
     The role is re-read on every request, rather than trusted from the
     session cookie.
     """
+
     def decorator(f: View) -> View:
         @wraps(f)
         def wrapper(*args: Any, **kwargs: Any) -> ResponseReturnValue:
@@ -48,5 +49,7 @@ def role_required(minimum: Role) -> Callable[[View], View]:
             user['is_librarian'] = role >= Role.LIBRARIAN
             user['is_admin'] = role >= Role.ADMIN
             return f(user, *args, **kwargs)
+
         return wrapper
+
     return decorator
