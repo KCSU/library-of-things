@@ -1,0 +1,9 @@
+# Install via: uv run pre-commit install
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --frozen ruff format
+        language: system
+        types_or: [python, pyi]

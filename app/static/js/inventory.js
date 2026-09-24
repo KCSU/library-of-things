@@ -63,7 +63,6 @@ function showOverlay(item) {
   // Show/hide sections appropriately
   $('.add-item-contents').toggleClass('hidden', !isNewItem);
   $('.edit-item-contents').toggleClass('hidden', isNewItem);
-  $('.delete-item-contents').toggleClass('hidden', isNewItem);
 
   // Store item ID in overlay for later use
   const overlay = $('.overlay');
@@ -72,24 +71,13 @@ function showOverlay(item) {
   revealOverlay();
 }
 
-function deleteItem() {
-  const overlay = $('.overlay');
-  const itemId = overlay.data('id');
-  
-  if (!itemId) {
-    alert('No item selected for deletion.');
+function deleteItem(itemId, title) {
+  if (!confirm(`Delete "${title}"? This action is irreversible!`)) {
     return;
   }
-  
-  if (!confirm('Are you sure you want to delete this item? This action is irreversible!')) {
-    return;
-  }
-  
+
   post('/admin/api/delete_item', { id: itemId })
-    .then(() => {
-      dismissOverlay();
-      location.reload();
-    })
+    .then(() => location.reload())
     .catch(err => alert('Error: ' + err.message));
 }
 

@@ -1,4 +1,5 @@
 {% extends "sidebar.html" %}
+{% from "pager.html" import pager %}
 {% block content %}
 
 <div class="container mx-auto p-2 md:px-6 lg:px-16">
@@ -9,9 +10,12 @@
 
   <form class="form grid gap-2 mb-6" onsubmit="return false">
     <label for="user-search">Search</label>
-    <input id="user-search" type="search" autocomplete="off"
-      placeholder="CRSid, name or group" autocapitalize="none"
-      autocorrect="off" spellcheck="false">
+    <div class="relative">
+      {{ icon("search", "icon size-4! absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none") }}
+      <input id="user-search" type="search" autocomplete="off"
+        placeholder="CRSid, name or group" autocapitalize="none"
+        autocorrect="off" spellcheck="false" class="pl-8!">
+    </div>
   </form>
 
   <div class="overflow-x-auto">
@@ -23,7 +27,7 @@
           <th class="w-32 font-semibold">Group</th>
           <th class="w-24 font-semibold">Account Enabled</th>
           {% if can_edit %}
-          <th class="w-24 font-semibold">Actions</th>
+          <th class="w-24 font-semibold text-right!">Actions</th>
           {% endif %}
         </tr>
       </thead>
@@ -37,11 +41,11 @@
           <td class="text-ellipsis overflow-hidden">{{ row.group }}</td>
           <td>{{ 'Yes' if row.user_enabled else 'No' }}</td>
           {% if can_edit %}
-          <td>
+          <td class="text-right">
             {% if row.crsid == user.crsid %}
             <span class="text-gray-500 text-sm">That's you</span>
             {% else %}
-            <button class="btn {{ 'btn-secondary' if row.user_enabled else 'btn-primary' }} text-sm toggle-enabled"
+            <button class="{{ 'btn-sm-secondary' if row.user_enabled else 'btn-sm-primary' }} toggle-enabled"
               data-crsid="{{ row.crsid }}"
               data-enable="{{ 'false' if row.user_enabled else 'true' }}">
               {{ 'Disable' if row.user_enabled else 'Enable' }}
@@ -55,17 +59,7 @@
     </table>
   </div>
 
-  <div class="flex flex-col md:flex-row justify-between items-center mt-4 text-sm gap-4">
-    <div class="text-gray-600">
-      Showing <span id="start-item">0</span> to <span id="end-item">0</span> of
-      <span id="total-items">0</span> users
-    </div>
-    <div class="flex gap-2 items-center max-md:pb-4">
-      <button id="prev-btn" class="btn btn-secondary" onclick="changePage(-1)" disabled>Previous</button>
-      <span id="page-info" class="px-3">Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
-      <button id="next-btn" class="btn btn-secondary" onclick="changePage(1)">Next</button>
-    </div>
-  </div>
+  {{ pager('users', client_side=true) }}
 
   <div class="text-gray-600 text-sm mt-2">
     {% if not can_edit %}

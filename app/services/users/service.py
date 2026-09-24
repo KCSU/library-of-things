@@ -13,13 +13,19 @@ from app.models import Audit, Role, User
 def get_all_users() -> list[dict[str, Any]]:
     """Every user with their group name, ordered by CRSid."""
     with db_session() as session:
-        users = (session.query(User)
-                 .options(joinedload(User.group))
-                 .order_by(User.crsid)
-                 .all())
-        return [user.to_dict() | {
-            'group': user.group.display_name if user.group else 'Unknown',
-        } for user in users]
+        users = (
+            session.query(User)
+            .options(joinedload(User.group))
+            .order_by(User.crsid)
+            .all()
+        )
+        return [
+            user.to_dict()
+            | {
+                'group': user.group.display_name if user.group else 'Unknown',
+            }
+            for user in users
+        ]
 
 
 def check_user_access(crsid: str) -> Role | None:
@@ -34,12 +40,15 @@ def check_user_access(crsid: str) -> Role | None:
 def get_staff() -> list[dict[str, Any]]:
     """Everyone holding more than ordinary access, most senior first."""
     with db_session() as session:
-        staff = (session.query(User)
-                 .filter(User.role > Role.USER)
-                 .order_by(User.role.desc(), User.crsid)
-                 .all())
-        return [user.to_dict() | {'role_label': Role(user.role).label}
-                for user in staff]
+        staff = (
+            session.query(User)
+            .filter(User.role > Role.USER)
+            .order_by(User.role.desc(), User.crsid)
+            .all()
+        )
+        return [
+            user.to_dict() | {'role_label': Role(user.role).label} for user in staff
+        ]
 
 
 def set_role(crsid: str, role: Role, acting_crsid: str) -> dict[str, Any]:
@@ -59,17 +68,28 @@ def set_role(crsid: str, role: Role, acting_crsid: str) -> dict[str, Any]:
             raise ValueError(f'{crsid} is already {role.label.lower()}.')
 
         # Locking read before the write
-        admins = [u.crsid for u in session.query(User)
-                  .filter(User.role == Role.ADMIN).with_for_update()]
+        admins = [
+            u.crsid
+            for u in session.query(User)
+            .filter(User.role == Role.ADMIN)
+            .with_for_update()
+        ]
         if role < Role.ADMIN and admins == [crsid]:
             raise ValueError('That would leave the site with no administrator.')
 
         user.role = role
         session.flush()
 
-        session.add(Audit(actor_crsid=acting_crsid, message=(
-            f'Changed {crsid} from {previous.label.lower()} '
-            f'to {role.label.lower()}')))
+        session.add(
+            Audit(
+                actor_crsid=acting_crsid,
+                message=(
+                    f'{"Promoted" if role > previous else "Demoted"} {crsid} '
+                    f'from {previous.label.lower()} to {role.label.lower()}'
+                ),
+                extra={'user_id': str(user.id), 'user_crsid': crsid},
+            )
+        )
 
         return {
             'crsid': crsid,
@@ -80,8 +100,9 @@ def set_role(crsid: str, role: Role, acting_crsid: str) -> dict[str, Any]:
         }
 
 
-def set_user_enabled(crsid: str, enabled: bool, acting_crsid: str,
-                     reason: str) -> dict[str, Any]:
+def set_user_enabled(
+    crsid: str, enabled: bool, acting_crsid: str, reason: str
+) -> dict[str, Any]:
     """Grant or revoke site access, and record who did it and why.
 
     Refuses to touch the caller's own account.
@@ -104,18 +125,24 @@ def set_user_enabled(crsid: str, enabled: bool, acting_crsid: str,
             raise ValueError(f'{crsid} is already {state}.')
 
         # Locking read before the write
-        admins = [u.crsid for u in session.query(User)
-                  .filter(User.role == Role.ADMIN, User.user_enabled.is_(True))
-                  .with_for_update()]
+        admins = [
+            u.crsid
+            for u in session.query(User)
+            .filter(User.role == Role.ADMIN, User.user_enabled.is_(True))
+            .with_for_update()
+        ]
         if not enabled and admins == [crsid]:
             raise ValueError('That would leave the site with no administrator.')
 
         user.user_enabled = enabled
         session.flush()
 
-        session.add(Audit(
-            actor_crsid=acting_crsid,
-            message=(f'{"Enabled" if enabled else "Disabled"} '
-                     f'account for {crsid}: {reason}')))
+        session.add(
+            Audit(
+                actor_crsid=acting_crsid,
+                message=(f'{"Enabled" if enabled else "Disabled"} account for {crsid}'),
+                extra={'user_id': str(user.id), 'user_crsid': crsid, 'reason': reason},
+            )
+        )
 
         return {'crsid': crsid, 'name': user.name, 'enabled': enabled}

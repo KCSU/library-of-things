@@ -1,0 +1,27 @@
+{#
+  Shared pagination bar.
+#}
+{% macro pager(noun, start=0, end=0, total=0, page=1, pages=1,
+               prev_href=none, next_href=none, client_side=false) %}
+<div class="flex flex-col md:flex-row justify-between items-center mt-4 text-sm gap-4">
+  <div class="text-gray-600">
+    Showing <span id="start-item">{{ start }}</span> to <span id="end-item">{{ end }}</span> of
+    <span id="total-items">{{ total }}</span> {{ noun }}
+  </div>
+  <div class="flex gap-2 items-center max-md:pb-4">
+    {{ _step('prev-btn', 'Previous', -1, prev_href, client_side) }}
+    <span id="page-info" class="px-3">Page <span id="current-page">{{ page }}</span> of <span id="total-pages">{{ pages }}</span></span>
+    {{ _step('next-btn', 'Next', 1, next_href, client_side) }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro _step(id, label, direction, href, client_side) %}
+{% if client_side %}
+<button id="{{ id }}" class="btn-sm-secondary" onclick="changePage({{ direction }})"{{ ' disabled' if direction < 0 }}>{{ label }}</button>
+{% elif href %}
+<a id="{{ id }}" class="btn-sm-secondary" href="{{ href }}">{{ label }}</a>
+{% else %}
+<button id="{{ id }}" class="btn-sm-secondary" disabled>{{ label }}</button>
+{% endif %}
+{% endmacro %}

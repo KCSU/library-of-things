@@ -26,6 +26,15 @@ _NOT_AUTHORIZED = (
 )
 
 
+def is_cambridge_account(userinfo: dict) -> bool:
+    """Email suffix matches exactly '@cam.ac.uk', verified, with the hd claim."""
+    return (
+        userinfo.get('email', '').lower().endswith('@cam.ac.uk')
+        and userinfo.get('email_verified') is True
+        and userinfo.get('hd') == 'cam.ac.uk'
+    )
+
+
 @auth_bp.route('/login')
 def login() -> ResponseReturnValue:
     if session.get('user') is None:
@@ -44,9 +53,7 @@ def oauth2() -> ResponseReturnValue:
     oauth = current_app.extensions.get('authlib.integrations.flask_client')
     if oauth is None:
         return redirect(url_for('auth.login'))
-    return oauth.google.authorize_redirect(
-        url_for('auth.authorized', _external=True)
-    )
+    return oauth.google.authorize_redirect(url_for('auth.authorized', _external=True))
 
 
 @auth_bp.route('/authorized')
@@ -65,13 +72,9 @@ def authorized() -> ResponseReturnValue:
         return redirect(url_for('auth.login'))
 
     userinfo = token['userinfo']
-    email = userinfo.get('email', '')
 
-    # Email suffix matches exactly '@cam.ac.uk'.
-    if (email.lower().endswith('@cam.ac.uk')
-            and userinfo.get('email_verified') is True
-            and userinfo.get('hd') == 'cam.ac.uk'):
-        crsid = email.split('@')[0].lower()
+    if is_cambridge_account(userinfo):
+        crsid = userinfo['email'].split('@')[0].lower()
 
         if user_service.check_user_access(crsid) is not None:
             session['user'] = userinfo

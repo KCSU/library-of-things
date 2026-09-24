@@ -1,4 +1,5 @@
 {% extends "sidebar.html" %}
+{% from "pager.html" import pager %}
 {% block content %}
 
 <div class="container mx-auto p-2 md:px-6 lg:px-16">
@@ -9,6 +10,17 @@
     </p>
   </header>
 
+  <form class="form grid gap-2 mb-6" method="get" action="{{ url_for('admin.audit_log') }}">
+    <label for="audit-search">Search</label>
+    <div class="relative">
+      {{ icon("search", "icon size-4! absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none") }}
+      <input id="audit-search" name="q" type="search" value="{{ q }}" autocomplete="off"
+        placeholder="e.g. CRSid, item name" autocapitalize="none"
+        autocorrect="off" spellcheck="false" class="pl-8!">
+    </div>
+  </form>
+
+  <div id="audit-results">
   {% if entries %}
   <div class="overflow-x-auto">
     <table class="table table-fixed w-full text-sm">
@@ -24,18 +36,34 @@
         <tr>
           <td class="text-gray-600">{{ entry.when }}</td>
           <td class="font-medium">{{ entry.actor }}</td>
-          <td class="text-ellipsis overflow-hidden">{{ entry.message }}</td>
+          <td class="text-ellipsis overflow-hidden">
+            {% if entry.extra %}
+            <details class="group">
+              <summary class="flex items-center justify-between gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <span class="min-w-0">{{ entry.message }}</span>
+                {{ icon("chevron-right", "icon shrink-0 text-gray-500 transition-transform group-open:rotate-90") }}
+              </summary>
+              <pre class="mt-2 p-2 rounded text-xs whitespace-pre-wrap break-all bg-gray-500/10">{{ entry.extra }}</pre>
+            </details>
+            {% else %}
+            {{ entry.message }}
+            {% endif %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <div class="text-gray-600 text-sm mt-2">
-    Showing the most recent {{ entries|length }} of at most {{ limit }} entries.
-  </div>
+  {{ pager('entries', start, end, total, page, pages,
+           prev_href=url_for('admin.audit_log', page=page - 1, q=q or none) if page > 1 else none,
+           next_href=url_for('admin.audit_log', page=page + 1, q=q or none) if page < pages else none) }}
   {% else %}
-  <p class="text-gray-500">Nothing has been logged yet.</p>
+  <p class="text-gray-500">
+    {% if q %}No entries match &ldquo;{{ q }}&rdquo;.{% else %}Nothing has been logged yet.{% endif %}
+  </p>
   {% endif %}
+  </div>
 </div>
 
+<script src="{{ url_for('static', filename='js/audit.js') }}"></script>
 {% endblock %}

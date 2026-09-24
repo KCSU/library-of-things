@@ -17,10 +17,12 @@ items_bp = Blueprint('items', __name__)
 @items_bp.route('/admin/inventory')
 @role_required(Role.LIBRARIAN)
 def inventory(user: dict[str, Any]) -> ResponseReturnValue:
-    return render_template('admin/inventory.html',
-                           items=item_service.get_all_admin_visible_items(),
-                           categories=item_service.get_all_categories(),
-                           user=user)
+    return render_template(
+        'admin/inventory.html',
+        items=item_service.get_all_admin_visible_items(),
+        categories=item_service.get_all_categories(),
+        user=user,
+    )
 
 
 @items_bp.route('/admin/api/edit_item', methods=['POST'])
@@ -34,7 +36,7 @@ def api_edit_item(user: dict[str, Any]) -> ResponseReturnValue:
     if not isinstance(data, dict):
         return jsonify({'error': 'Invalid request'}), 400
 
-    if not item_service.update_item(item_id, data):
+    if not item_service.update_item(item_id, data, user['crsid']):
         return jsonify({'error': 'Item not found'}), 404
     return jsonify({'success': True})
 
@@ -48,7 +50,8 @@ def api_new_item(user: dict[str, Any]) -> ResponseReturnValue:
     if not isinstance(data, dict):
         return jsonify({'error': 'Invalid request'}), 400
 
-    return jsonify({'success': True, 'id': item_service.create_item(data)})
+    item_id = item_service.create_item(data, user['crsid'])
+    return jsonify({'success': True, 'id': item_id})
 
 
 @items_bp.route('/admin/api/delete_item', methods=['POST'])
@@ -57,7 +60,7 @@ def api_new_item(user: dict[str, Any]) -> ResponseReturnValue:
 def api_delete_item(user: dict[str, Any]) -> ResponseReturnValue:
     item_id = json_uuid(request.get_json() or {}, 'id')
 
-    if not item_service.delete_item(item_id):
+    if not item_service.delete_item(item_id, user['crsid']):
         return jsonify({'error': 'Item not found'}), 404
     return jsonify({'success': True})
 
