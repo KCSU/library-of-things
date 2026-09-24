@@ -32,9 +32,11 @@ def api_update_settings(user: dict[str, Any]) -> ResponseReturnValue:
     payload = request.get_json()
 
     announcement = payload.get('announcement', {})
-    settings_service.update_announcement(
-        announcement.get('text', ''), announcement.get('enabled', False)
+    settings_service.update_settings(
+        announcement.get('text', ''),
+        announcement.get('enabled', False),
+        payload.get('read_only', False),
+        user['crsid'],
     )
-    settings_service.set_read_only_mode(payload.get('read_only', False))
 
     return jsonify({'success': True})
