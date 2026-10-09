@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def register_icon_helper(app: Flask) -> None:
     root = Path(app.root_path) / 'static' / 'icons'
     icons = {
-        str(path.relative_to(root).with_suffix('')): path.read_text()
+        str(path.relative_to(root).with_suffix('')): path.read_text(encoding='utf-8')
         for path in root.rglob('*.svg')
     }
     logger.info('Loaded %d icons from %s', len(icons), root)

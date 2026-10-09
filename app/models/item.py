@@ -88,7 +88,7 @@ class Item(BaseModel):
             return '1 day' if days == 1 else f'{days} days'
 
         if self.loan_end_date is not None:
-            return f'Until {self.loan_end_date.strftime("%-d %B")}'
+            return f'Until {self.loan_end_date.day} {self.loan_end_date.strftime("%B")}'
 
         return 'Yours to keep'
 
