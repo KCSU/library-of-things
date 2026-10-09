@@ -5,10 +5,10 @@
 </header>
 {% endif %}
 
-<div class="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 xl:mx-8">
+<div class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,400px),1fr))] gap-6 xl:mx-8">
   {% for item in items %}
-  <div class="card min-w-0">
-    <header>
+  <div class="card min-w-0 grid grid-rows-subgrid row-span-3">
+    <header class="content-start">
       <h2>{{ item.title }}</h2>
       <p>{{ item.description }}</p>
     </header>
@@ -20,7 +20,7 @@
         title="Click to expand image" />
     </section>
     {% endif %}
-    <footer class="flex items-center gap-x-2 gap-y-4 flex-wrap min-w-0">
+    <footer class="row-start-3 flex items-center gap-x-2 gap-y-4 flex-wrap min-w-0">
       <span class="badge-outline py-1.5 px-2">
         {% if item.is_permanent %}{{ icon("infinity") }}
         {% elif item.loan_end_date %}{{ icon("clock-10") }}
