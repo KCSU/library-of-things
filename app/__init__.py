@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+import traceback
 from collections.abc import Callable
 from datetime import UTC, datetime
 from functools import partial
@@ -20,7 +21,7 @@ from flask_talisman import Talisman
 from sqlalchemy import text
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from app.common import database
+from app.common import alerts, database
 from app.common.database import init_database
 from app.common.icons import register_icon_helper
 from app.config import (
@@ -98,6 +99,11 @@ def create_app(config_name: str = 'production') -> Flask:
         logger.info('Database initialised successfully')
     except Exception:
         logger.exception('Database initialisation failed; refusing to start')
+        alerts.send(
+            'startup-failed',
+            'Library of Things failed to start: database unreachable',
+            detail=traceback.format_exc(),
+        )
         raise
 
     try:

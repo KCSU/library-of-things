@@ -51,6 +51,14 @@ GOOGLE_SERVER_METADATA_URL = (
 )
 GOOGLE_SCOPE = 'profile email openid'
 
+# SMTP configuration
+SMTP_HOST = required_from_env('SMTP_HOST')
+SMTP_PORT = int(required_from_env('SMTP_PORT'))
+SMTP_USERNAME = required_from_env('SMTP_USERNAME')
+SMTP_PASSWORD = required_from_env('SMTP_PASSWORD')
+SMTP_FROM = required_from_env('SMTP_FROM')
+ALERTS_TOPIC = os.getenv('ALERTS_TOPIC')
+
 # Database image storage configuration
 IMAGE_MAX_DIMENSION = 1200  # width, height
 IMAGE_QUALITY = 80

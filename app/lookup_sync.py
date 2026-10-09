@@ -2,11 +2,13 @@
 
 import logging
 import time
+import traceback
 from datetime import UTC, datetime, timedelta
 
 import click
 from flask import Flask
 
+from app.common import alerts
 from app.config import (
     CAMBRIDGE_UIS_API_KEY,
     CAMBRIDGE_UIS_API_SECRET,
@@ -73,3 +75,8 @@ def register_cli(app: Flask) -> None:
             except Exception:
                 # A Lookup outage must not kill the scheduler; try tomorrow.
                 logger.exception('Scheduled sync failed')
+                alerts.send(
+                    'lookup-sync-failed',
+                    'Daily Lookup sync failed',
+                    detail=traceback.format_exc(),
+                )
