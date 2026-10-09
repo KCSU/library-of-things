@@ -47,3 +47,7 @@ class User(BaseModel):
         foreign_keys='Loan.user_id', back_populates='user'
     )
     requests: Mapped[list[Request]] = relationship(back_populates='user')
+
+    @property
+    def email(self) -> str:
+        return f'{self.crsid}@cam.ac.uk'

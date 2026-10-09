@@ -6,6 +6,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session, selectinload
 
+from app.common import mail
 from app.common.database import db_session
 from app.models import Audit, Item, Loan, Request, User
 
@@ -126,6 +127,7 @@ def refuse_request(request_id: uuid.UUID, reason: str, acting_crsid: str) -> boo
             'item_id': str(req.item_id),
             'reason': reason,
         }
+        refused = mail.render('request_refused.txt', to=req.user.email, request=req)
         session.delete(req)
         session.add(
             Audit(
@@ -134,7 +136,10 @@ def refuse_request(request_id: uuid.UUID, reason: str, acting_crsid: str) -> boo
                 extra=extra,
             )
         )
-        return True
+
+    # Only once the refusal is committed.
+    mail.send(refused)
+    return True
 
 
 def count_requests() -> int:
@@ -238,13 +243,20 @@ def approve_request(request_id: uuid.UUID, acting_crsid: str) -> dict[str, Any]:
                 },
             )
         )
+        approved = mail.render(
+            'request_approved.txt', to=req.user.email, loan=session.get(Loan, loan_id)
+        )
         session.delete(req)
 
-        return {
+        result = {
             'success': True,
             'loan_id': loan_id,
             'permanent': item.is_permanent,
         }
+
+    # Only once the loan is committed.
+    mail.send(approved)
+    return result
 
 
 def lend_to_user(

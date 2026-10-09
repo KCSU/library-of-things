@@ -36,6 +36,7 @@ from app.config import (
     MYSQL_DATABASE_URL,
 )
 from app.lookup_sync import register_cli
+from app.reminders import register_cli as register_reminders_cli
 
 logger = logging.getLogger(__name__)
 
@@ -128,6 +129,7 @@ def create_app(config_name: str = 'production') -> Flask:
     register_context_processors(app)
     register_error_handlers(app)
     register_cli(app)
+    register_reminders_cli(app)
 
     return app
 

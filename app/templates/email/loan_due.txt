@@ -1,0 +1,12 @@
+Subject: [KCSU Library of Things] Your loan of {{ loan.item.title }} is due today
+Dear {{ loan.user.name }},
+
+This is a reminder that your loan of the item "{{ loan.item.title }}" is due by the end of today, {{ loan.due_date.strftime('%A') }} {{ loan.due_date.day }} {{ loan.due_date.strftime('%B %Y') }}.
+
+When returning your item, please place it in the Returns Box in the JCR, clearly identified with your CRSid legibly written.
+
+If you have already returned it, thank you! Please ignore this email; it can take us a little while to sign returns off.
+
+If you have any questions, or if you would like to become a Librarian of Things / get more involved with the Greens Society that runs the LofT, we will be delighted to hear from you. Please email us at greens@kcsu.org.uk.
+
+KCSU Library of Things

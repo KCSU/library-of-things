@@ -229,3 +229,5 @@ static/css/output.css
 *.sql
 *.sql.gz
 *.sql.zip
+
+secrets/

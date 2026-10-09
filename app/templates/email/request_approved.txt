@@ -1,0 +1,20 @@
+Subject: [KCSU Library of Things] Your request for {{ loan.item.title }} has been approved
+Dear {{ loan.user.name }},
+
+Your request for the item "{{ loan.item.title }}" has been approved, and it is now available to collect from the JCR.
+
+If your item is commonplace (a bowl, plate, cutlery, frying pan or saucepan) then please choose from any of the available items on the windowsill of the JCR. Please only borrow one item per request made.
+
+For all other items, please check the Collections Box and retrieve the item which should be clearly identified with your CRSid.
+
+{% if loan.due_date -%}
+Please return the item by {{ loan.due_date.strftime('%A') }} {{ loan.due_date.day }} {{ loan.due_date.strftime('%B %Y') }}. You can return it at any time before then by arrangement.
+
+When returning your item, please place it in the Returns Box, clearly identified with your CRSid legibly written.
+{%- else -%}
+This item is yours to keep. You don't need to return it.
+{%- endif %}
+
+If you have any questions, or if you would like to become a Librarian of Things / get more involved with the Greens Society that runs the LofT, we will be delighted to hear from you. Please email us at greens@kcsu.org.uk.
+
+KCSU Library of Things

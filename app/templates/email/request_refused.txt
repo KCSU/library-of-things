@@ -1,0 +1,8 @@
+Subject: [KCSU Library of Things] Your request for {{ request.item.title }} has been refused
+Dear {{ request.user.name }},
+
+Unfortunately, your request for the item "{{ request.item.title }}" has been refused. This may be because you have told us you no longer want the item, or it may be due to an error in our stock records meaning that we no longer have another "{{ request.item.title }}" and therefore cannot deliver one, in which case, we apologise.
+
+If you have any questions, or if you would like to become a Librarian of Things / get more involved with the Greens Society that runs the LofT, we will be delighted to hear from you. Please email us at greens@kcsu.org.uk.
+
+KCSU Library of Things
