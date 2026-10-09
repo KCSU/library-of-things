@@ -25,10 +25,26 @@ class Setting(BaseModel):
 
     read_only_mode: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    # Which emails are sent to borrowers. See app/templates/email.
+    email_request_approved: Mapped[bool] = mapped_column(
+        Boolean, default=True, nullable=False
+    )
+    email_request_refused: Mapped[bool] = mapped_column(
+        Boolean, default=True, nullable=False
+    )
+    email_loan_due: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    email_loan_overdue: Mapped[bool] = mapped_column(
+        Boolean, default=True, nullable=False
+    )
+
     def to_dict(self) -> dict[str, Any]:
         return {
             'id': str(self.id),
             'announcement_text': self.announcement_text,
             'announcement_enabled': self.announcement_enabled,
             'read_only_mode': self.read_only_mode,
+            'email_request_approved': self.email_request_approved,
+            'email_request_refused': self.email_request_refused,
+            'email_loan_due': self.email_loan_due,
+            'email_loan_overdue': self.email_loan_overdue,
         }

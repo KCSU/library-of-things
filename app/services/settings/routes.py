@@ -21,6 +21,7 @@ def settings(user: dict[str, Any]) -> ResponseReturnValue:
         user=user,
         announcement=settings_service.get_announcement(),
         read_only=settings_service.get_read_only_mode(),
+        emails=settings_service.get_emails(),
         can_edit=user['is_admin'],
     )
 
@@ -32,10 +33,12 @@ def api_update_settings(user: dict[str, Any]) -> ResponseReturnValue:
     payload = request.get_json()
 
     announcement = payload.get('announcement', {})
+    emails = payload.get('emails', {})
     settings_service.update_settings(
         announcement.get('text', ''),
         announcement.get('enabled', False),
         payload.get('read_only', False),
+        {email: emails.get(email, False) for email in settings_service.EMAILS},
         user['crsid'],
     )
 

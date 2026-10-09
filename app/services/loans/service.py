@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.common import mail
 from app.common.database import db_session
 from app.models import Audit, Item, Loan, Request, User
+from app.services.settings import service as settings_service
 
 
 def _create_loan(
@@ -115,6 +116,7 @@ def request_item(item_id: uuid.UUID, user_session: dict[str, Any]) -> bool:
 
 def refuse_request(request_id: uuid.UUID, reason: str, acting_crsid: str) -> bool:
     """Drop a request, recording who refused it and the reason for it."""
+    send_email = settings_service.get_emails()['request_refused']
     with db_session() as session:
         req = session.query(Request).filter(Request.id == request_id).first()
         if req is None:
@@ -127,7 +129,11 @@ def refuse_request(request_id: uuid.UUID, reason: str, acting_crsid: str) -> boo
             'item_id': str(req.item_id),
             'reason': reason,
         }
-        refused = mail.render('request_refused.txt', to=req.user.email, request=req)
+        refused = (
+            mail.render('request_refused.txt', to=req.user.email, request=req)
+            if send_email
+            else None
+        )
         session.delete(req)
         session.add(
             Audit(
@@ -138,7 +144,8 @@ def refuse_request(request_id: uuid.UUID, reason: str, acting_crsid: str) -> boo
         )
 
     # Only once the refusal is committed.
-    mail.send(refused)
+    if refused:
+        mail.send(refused)
     return True
 
 
@@ -216,6 +223,7 @@ def approve_request(request_id: uuid.UUID, acting_crsid: str) -> dict[str, Any]:
     'permanent' says whether the item is given away rather than lent; either
     way a loan row is written, without a due date in the permanent case.
     """
+    send_email = settings_service.get_emails()['request_approved']
     with db_session() as session:
         req = session.query(Request).filter(Request.id == request_id).first()
         if not req:
@@ -243,8 +251,14 @@ def approve_request(request_id: uuid.UUID, acting_crsid: str) -> dict[str, Any]:
                 },
             )
         )
-        approved = mail.render(
-            'request_approved.txt', to=req.user.email, loan=session.get(Loan, loan_id)
+        approved = (
+            mail.render(
+                'request_approved.txt',
+                to=req.user.email,
+                loan=session.get(Loan, loan_id),
+            )
+            if send_email
+            else None
         )
         session.delete(req)
 
@@ -255,7 +269,8 @@ def approve_request(request_id: uuid.UUID, acting_crsid: str) -> dict[str, Any]:
         }
 
     # Only once the loan is committed.
-    mail.send(approved)
+    if approved:
+        mail.send(approved)
     return result
 
 

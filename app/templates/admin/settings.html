@@ -28,6 +28,27 @@
     </section>
 
     <section class="grid gap-4">
+      <h3 class="text-lg font-medium">Email Notifications</h3>
+
+      <div class="rounded-lg border shadow-xs divide-y" id="email-options">
+        {% for key, label, caption in [
+          ('request_approved', 'Request approved', 'When a request is approved, notify the user with collection and return details.'),
+          ('request_refused', 'Request refused', 'When a request is refused, notify the user.'),
+          ('loan_due', 'Loan due', 'Send a reminder on the day a loan is due.'),
+          ('loan_overdue', 'Loan overdue', 'Send a reminder email every day after a loan is due, until it is marked returned.'),
+        ] %}
+        <div class="gap-2 flex flex-row items-start justify-between p-4">
+          <div class="flex flex-col gap-0.5">
+            <label for="email-{{ key }}-toggle" class="leading-normal">{{ label }}</label>
+            <p class="text-gray-500 text-sm">{{ caption }}</p>
+          </div>
+          <input type="checkbox" id="email-{{ key }}-toggle" data-email="{{ key }}" role="switch" {{ 'checked' if emails and emails[key] else '' }} {{ 'disabled' if not can_edit }}>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="grid gap-4">
       <h3 class="text-lg font-medium">Danger Zone</h3>
 
       <div class="gap-2 flex flex-row items-start justify-between rounded-lg border p-4 shadow-xs border-[#f8514966]">

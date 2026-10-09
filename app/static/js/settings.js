@@ -11,7 +11,10 @@ $(document).ready(function() {
         text: $('#announcement-text').val(),
         enabled: $('#announcement-toggle').prop('checked')
       },
-      read_only: $('#read-only-toggle').prop('checked')
+      read_only: $('#read-only-toggle').prop('checked'),
+      emails: Object.fromEntries(
+        $('#email-options input[data-email]').get().map(input => [input.dataset.email, input.checked])
+      )
     };
     
     if (!confirm(`Are you sure you want to update the site settings?`)) {
@@ -27,5 +30,5 @@ $(document).ready(function() {
 function toggleAnnouncementText() {
   const toggle = $('#announcement-toggle');
   const textarea = $('#announcement-text');
-  textarea.prop('disabled', !toggle.prop('checked'));
+  textarea.prop('disabled', toggle.prop('disabled') || !toggle.prop('checked'));
 }

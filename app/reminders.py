@@ -16,9 +16,18 @@ logger = logging.getLogger(__name__)
 
 
 def collect_reminders(today: date) -> list[mail.Email]:
-    """One email per unreturned loan that is due today or overdue."""
+    """One email per unreturned loan that is due today or overdue.
+
+    Skips whichever of the two emails is turned off in the site settings.
+    """
     from app.common.database import db_session
     from app.models import Loan
+    from app.services.settings import service as settings_service
+
+    enabled = settings_service.get_emails()
+    if not (enabled['loan_due'] or enabled['loan_overdue']):
+        logger.info('Due and overdue emails are turned off; nothing to send')
+        return []
 
     tomorrow = datetime.combine(today + timedelta(days=1), datetime.min.time())
     with db_session() as session:
@@ -37,10 +46,15 @@ def collect_reminders(today: date) -> list[mail.Email]:
         for loan in loans:
             assert loan.due_date is not None  # filtered above
             days_overdue = (today - loan.due_date.date()).days
-            template = 'loan_overdue.txt' if days_overdue > 0 else 'loan_due.txt'
+            email = 'loan_overdue' if days_overdue > 0 else 'loan_due'
+            if not enabled[email]:
+                continue
             emails.append(
                 mail.render(
-                    template, to=loan.user.email, loan=loan, days_overdue=days_overdue
+                    f'{email}.txt',
+                    to=loan.user.email,
+                    loan=loan,
+                    days_overdue=days_overdue,
                 )
             )
         return emails
