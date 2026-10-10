@@ -6,6 +6,7 @@ from typing import Any
 
 from flask import jsonify
 from flask.typing import ResponseReturnValue
+from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
 from app.common.uuid import parse_id
@@ -27,6 +28,8 @@ def json_errors(f: View) -> View:
             return f(*args, **kwargs)
         except HTTPException:
             raise
+        except ValidationError as exc:
+            return jsonify({'error': _describe(exc)}), 400
         except ValueError as exc:
             return jsonify({'error': str(exc)}), 400
         except Exception:
@@ -34,6 +37,16 @@ def json_errors(f: View) -> View:
             return jsonify({'error': 'Something went wrong'}), 500
 
     return wrapper
+
+
+def _describe(exc: ValidationError) -> str:
+    """One readable line per invalid field."""
+    lines = []
+    for error in exc.errors():
+        field = '.'.join(str(part) for part in error['loc'])
+        message = error['msg'].removeprefix('Value error, ')
+        lines.append(f'{field}: {message}' if field else message)
+    return '\n'.join(lines)
 
 
 def json_uuid(payload: dict[str, Any], key: str) -> uuid.UUID:

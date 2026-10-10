@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.common.database import db_session
 from app.common.timing import log_slow
 from app.models import Audit, Category, Item
+from app.services.items.schemas import ItemInput
 
 # Columns whose edits are recorded in the audit entry's extra.
 _AUDITED_FIELDS = (
@@ -34,12 +35,7 @@ _ITEM_RELATIONS = (
 def get_all_admin_visible_items() -> list[dict[str, Any]]:
     """Every item, including ones admins have hidden from users."""
     with db_session() as session:
-        items = (
-            session.query(Item)
-            .options(*_ITEM_RELATIONS)
-            .order_by(Item.title)
-            .all()
-        )
+        items = session.query(Item).options(*_ITEM_RELATIONS).order_by(Item.title).all()
         return [item.to_dict() for item in items]
 
 
@@ -72,10 +68,10 @@ def _shown(session: Session, field: str, value: Any) -> str:
     return str(value)
 
 
-def create_item(data: dict[str, Any], acting_crsid: str) -> uuid.UUID:
+def create_item(data: ItemInput, acting_crsid: str) -> uuid.UUID:
     with db_session() as session:
         item = Item()
-        item.update_from_dict(data)
+        item.update_from_dict(data.model_dump())
         session.add(item)
         session.flush()
         session.add(
@@ -88,14 +84,13 @@ def create_item(data: dict[str, Any], acting_crsid: str) -> uuid.UUID:
         return item.id
 
 
-def update_item(
-    item_id: uuid.UUID, new_data: dict[str, Any], acting_crsid: str
-) -> bool:
+def update_item(item_id: uuid.UUID, data: ItemInput, acting_crsid: str) -> bool:
     with db_session() as session:
         item = session.query(Item).filter(Item.id == item_id).first()
         if not item:
             return False
 
+        new_data = data.model_dump()
         fields = [f for f in _AUDITED_FIELDS if f in new_data]
         before = {f: _shown(session, f, getattr(item, f)) for f in fields}
         item.update_from_dict(new_data)

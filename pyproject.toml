@@ -16,6 +16,7 @@ dependencies = [
     "pillow>=12.3.0",
     "protobuf==7.36.2",
     "google-auth==2.61.0",
+    "pydantic==2.12.5",
 ]
 
 [dependency-groups]
