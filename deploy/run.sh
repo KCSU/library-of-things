@@ -5,6 +5,7 @@ SOCKET="$APP_DIR/web.sock"
 cd "$APP_DIR"
 mkdir -p "$APP_DIR/logs"
 
+export PATH="$HOME/.local/bin:$PATH"
 uv sync --frozen --no-dev
 
 exec "$APP_DIR/.venv/bin/gunicorn" -w 2 -b "unix:$SOCKET" --log-file - app.run:app
