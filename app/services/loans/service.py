@@ -176,7 +176,7 @@ def get_all_active_loans() -> list[dict[str, Any]]:
             session.query(Loan)
             .join(Item)
             .join(User, Loan.user_id == User.id)
-            .filter(Loan.returned_at.is_(None))
+            .filter(Loan.returned_at.is_(None), Loan.due_date.is_not(None))
             .options(selectinload(Loan.item), selectinload(Loan.user))
             .order_by(Loan.due_date.asc())
             .all()

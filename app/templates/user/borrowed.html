@@ -31,8 +31,10 @@
               {{ icon("warning", "inline-block icon w-4!") }}
               {{ loan.due_date }}
             </div>
-            {% else %}
+            {% elif loan.due_date %}
             {{ loan.due_date }}
+            {% else %}
+            <span class="text-gray-500">Yours to keep</span>
             {% endif %}
           </td>
         </tr>
