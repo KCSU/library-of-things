@@ -21,6 +21,12 @@ function refuseRequest(req) {
 
 function toggleLendPanel() {
   $('#lend-panel').toggleClass('hidden');
+  if (!$('#lend-panel').hasClass('hidden')) {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    $('#lend-start').val(now.toISOString().slice(0, 16));
+  }
 }
 
 $(document).ready(function() {
