@@ -23,7 +23,6 @@ class Item(BaseModel):
     __tablename__ = 'items'
 
     id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
-    display_id: Mapped[str] = mapped_column(String(255), nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(2047), nullable=False)
     category_id: Mapped[uuid.UUID] = mapped_column(

@@ -72,7 +72,6 @@ class Loan(BaseModel):
             'is_returned': self.is_returned,
             'created_by': self.created_by.name if self.created_by else None,
             'item_title': self.item.title,
-            'item_display_id': self.item.display_id,
             'item_image_src': self.item.image_src,
             'borrower_name': self.user.name,
             'borrower_crsid': self.user.crsid,
@@ -100,7 +99,6 @@ class Request(BaseModel):
         return super().to_dict() | {
             'request_time': self.request_time.strftime(_TIMESTAMP_FORMAT),
             'item_title': self.item.title,
-            'item_display_id': self.item.display_id,
             'item_image_src': self.item.image_src,
             'item_location': self.item.location,
             'borrower_name': self.user.name,

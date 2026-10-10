@@ -21,7 +21,7 @@
         <label for="lend-item">Item</label>
         <select id="lend-item" required>
           {% for item in items %}
-          <option value="{{ item.id }}">{{ item.display_id }} - {{ item.title }}</option>
+          <option value="{{ item.id }}">{{ item.title }}</option>
           {% endfor %}
         </select>
       </div>

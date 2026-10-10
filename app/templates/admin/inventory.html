@@ -17,11 +17,6 @@
       <section class="text-sm">
         <form class="form grid gap-6" id="edit-form">
           <div class="grid gap-2">
-            <label for="item-id">Item ID *</label>
-            <input type="text" id="item-id" placeholder="42" required>
-          </div>
-
-          <div class="grid gap-2">
             <label for="item-name">Item Name *</label>
             <input type="text" id="item-name" placeholder="Item name" required>
           </div>
@@ -133,7 +128,6 @@
     <table class="table w-full">
       <thead>
         <tr>
-          <th>#</th>
           <th>Name</th>
           <th>Category</th>
           <th>Image</th>
@@ -146,7 +140,6 @@
       {% for item in items %}
       <tbody>
         <tr>
-          <td class="font-medium">{{ item.display_id }}</td>
           <td class="text-ellipsis overflow-hidden">{{ item.title }}</td>
           <td>{{ item.category }}</td>
           <td>

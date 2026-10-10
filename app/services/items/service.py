@@ -11,7 +11,6 @@ from app.models import Audit, Category, Item
 
 # Columns whose edits are recorded in the audit entry's extra.
 _AUDITED_FIELDS = (
-    'display_id',
     'title',
     'description',
     'category_id',
@@ -38,7 +37,7 @@ def get_all_admin_visible_items() -> list[dict[str, Any]]:
         items = (
             session.query(Item)
             .options(*_ITEM_RELATIONS)
-            .order_by(Item.display_id)
+            .order_by(Item.title)
             .all()
         )
         return [item.to_dict() for item in items]
@@ -57,7 +56,7 @@ def get_all_user_visible_items(
         if category:
             query = query.join(Category).filter(Category.category.ilike(category))
 
-        items = [item.to_dict() for item in query.order_by(Item.display_id)]
+        items = [item.to_dict() for item in query.order_by(Item.title)]
         return sorted(items, key=lambda item: item['available_count'] <= 0)
 
 

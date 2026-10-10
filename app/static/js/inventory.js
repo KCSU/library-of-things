@@ -6,7 +6,6 @@ $(document).ready(function () {
     
     // Collect form data
     const data = {
-      display_id: $('#item-id').val(),
       title: $('#item-name').val(),
       description: $('#item-description').val(),
       category_id: $('#item-category').val(),
@@ -18,7 +17,7 @@ $(document).ready(function () {
     };
 
     // Validate required fields
-    if (!data.display_id || !data.title || !data.description) {
+    if (!data.title || !data.description) {
       alert('Please fill in all required fields');
       return;
     }
@@ -42,7 +41,6 @@ $(document).ready(function () {
 
 function showOverlay(item) {
   // Populate form fields
-  $('#item-id').val(item.display_id ?? '');
   $('#item-name').val(item.title ?? '');
   $('#item-description').val(item.description ?? '');
   $('#item-count').val(item.count ?? 1);
