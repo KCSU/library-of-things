@@ -10,7 +10,7 @@ $(document).ready(function () {
       description: $('#item-description').val(),
       category_id: $('#item-category').val(),
       ...loanTermsFromForm(),
-      visible: $('#item-visible').is(':checked') ? 1 : 0,
+      visible: $('#item-visible').is(':checked'),
       count: parseInt($('#item-count').val()) || 1,
       location: $('#item-location').val() || null,
       comments: $('#item-comments').val() || null
