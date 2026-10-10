@@ -11,7 +11,7 @@ $(document).ready(function () {
       category_id: $('#item-category').val(),
       ...loanTermsFromForm(),
       visible: $('#item-visible').is(':checked'),
-      count: parseInt($('#item-count').val()) || 1,
+      count: countFromForm(),
       location: $('#item-location').val() || null,
       comments: $('#item-comments').val() || null
     };
@@ -85,6 +85,12 @@ function updateLoanModeFields() {
   $('#loan-end-date-field').prop('hidden', mode !== 'end_date');
   $('#item-loan-duration').prop('required', mode === 'duration');
   $('#item-loan-end-date').prop('required', mode === 'end_date');
+}
+
+function countFromForm() {
+  // Fall back to 1 when the field isn't a number.
+  const count = parseInt($('#item-count').val(), 10);
+  return Number.isNaN(count) ? 1 : count;
 }
 
 function loanTermsFromForm() {
