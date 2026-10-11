@@ -64,11 +64,6 @@ $(document).ready(() => {
   $(window).on('resize', handleSidebarResize);
 });
 
-function signOut() {
-  var auth2 = gapi.auth2.getAuthInstance();
-  auth2.signOut();
-}
-
 function revealOverlay() {
   const overlay = $('.overlay');
   overlay.removeClass('hidden');

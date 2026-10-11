@@ -203,7 +203,7 @@
         <img class="size-10 shrink-0 object-cover rounded-full" alt="{{ user.name }}" src="{{ user.picture }}">
         <div class="grid text-sm">
           <div>Logged in as <span class="font-semibold">{{ user.email | replace('@cam.ac.uk', '') }}</span></div>
-          <a onclick="signOut()" href="/logout" class="text-sm text-gray-500 hover:underline hover:cursor-pointer">Log
+          <a href="/logout" class="text-sm text-gray-500 hover:underline hover:cursor-pointer">Log
             out</a>
         </div>
       </div>
