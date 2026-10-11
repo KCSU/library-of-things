@@ -1,0 +1,26 @@
+{
+  "hosting": [
+    {
+      "target": "production",
+      "public": "deploy/firebase/public",
+      "ignore": ["**/.*"],
+      "rewrites": [
+        {
+          "source": "**",
+          "run": { "serviceId": "library-of-things-production", "region": "europe-west1" }
+        }
+      ]
+    },
+    {
+      "target": "staging",
+      "public": "deploy/firebase/public",
+      "ignore": ["**/.*"],
+      "rewrites": [
+        {
+          "source": "**",
+          "run": { "serviceId": "library-of-things-staging", "region": "europe-west1" }
+        }
+      ]
+    }
+  ]
+}

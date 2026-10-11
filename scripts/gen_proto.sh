@@ -8,4 +8,5 @@ uv run --frozen python -m grpc_tools.protoc \
     -I proto \
     --python_out=app/proto \
     --pyi_out=app/proto \
-    proto/kcsu/alerts/v1/alert.proto
+    proto/kcsu/alerts/v1/alert.proto \
+    proto/kcsu/lookup/v1/group_snapshot.proto

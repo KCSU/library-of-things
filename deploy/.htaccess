@@ -1,9 +1,0 @@
-RewriteEngine On
-DirectoryIndex disabled
-
-RequestHeader set Host expr=%{HTTP_HOST}
-RequestHeader set X-Forwarded-For expr=%{REMOTE_ADDR}
-RequestHeader set X-Forwarded-Proto expr=%{REQUEST_SCHEME}
-RequestHeader set X-Real-IP expr=%{REMOTE_ADDR}
-
-RewriteRule ^(.*)$ unix:/societies/kcsu/library-of-things/web.sock|http://library.kcsu.org.uk/$1 [P,NE,L,QSA]

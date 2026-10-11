@@ -3,12 +3,11 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from sqlalchemy import Boolean, Text
+from sqlalchemy import Boolean, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.common.uuid import new_id
 from app.models.base_model import BaseModel
-from app.models.uuid import UUIDBinary
 
 
 class Setting(BaseModel):
@@ -16,7 +15,7 @@ class Setting(BaseModel):
 
     __tablename__ = 'settings'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=new_id)
 
     announcement_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     announcement_enabled: Mapped[bool] = mapped_column(

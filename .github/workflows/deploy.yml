@@ -1,0 +1,84 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: staging or production
+        required: true
+        type: string
+      env_vars:
+        required: true
+        type: string
+      secret_refs:
+        required: true
+        type: string
+
+env:
+  PROJECT: kcsu-library-of-things
+  REGION: europe-west1
+  RUNTIME_SERVICE_ACCOUNT: library-runtime@kcsu-library-of-things.iam.gserviceaccount.com
+  IMAGE: europe-west1-docker.pkg.dev/kcsu-library-of-things/library-of-things/app:${{ github.sha }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/492833102280/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-deployer@kcsu-library-of-things.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v3
+
+      - name: Docker Build / Push
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+          docker build --tag "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Deploy (web app)
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: library-of-things-${{ inputs.environment }}
+          project_id: ${{ env.PROJECT }}
+          region: ${{ env.REGION }}
+          image: ${{ env.IMAGE }}
+          env_vars: ${{ inputs.env_vars }}
+          env_vars_update_strategy: overwrite
+          secrets: ${{ inputs.secret_refs }}
+          secrets_update_strategy: overwrite
+          flags: >-
+            --service-account=${{ env.RUNTIME_SERVICE_ACCOUNT }}
+            --memory=1Gi --cpu=1 --cpu-boost
+            --concurrency=2 --min-instances=0 --max-instances=3
+
+      - name: Deploy (email reminders job)
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          job: library-send-reminders-${{ inputs.environment }}
+          project_id: ${{ env.PROJECT }}
+          region: ${{ env.REGION }}
+          image: ${{ env.IMAGE }}
+          env_vars: ${{ inputs.env_vars }}
+          env_vars_update_strategy: overwrite
+          secrets: ${{ inputs.secret_refs }}
+          secrets_update_strategy: overwrite
+          # intentionally 0 retries to prevent duplicate emails
+          flags: >-
+            --service-account=${{ env.RUNTIME_SERVICE_ACCOUNT }}
+            --command=flask "--args=send-reminders,--alert"
+            --max-retries=0 --task-timeout=15m

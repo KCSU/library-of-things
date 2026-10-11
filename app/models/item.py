@@ -6,12 +6,11 @@ import datetime
 import uuid
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.common.uuid import new_id
 from app.models.base_model import BaseModel
-from app.models.uuid import UUIDBinary
 
 if TYPE_CHECKING:
     from app.models.category import Category
@@ -22,11 +21,11 @@ if TYPE_CHECKING:
 class Item(BaseModel):
     __tablename__ = 'items'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=new_id)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(2047), nullable=False)
     category_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('categories.id'), nullable=False
+        Uuid, ForeignKey('categories.id'), nullable=False
     )
 
     # A set duration from the borrowing date, or a fixed calendar end date.

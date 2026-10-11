@@ -1,0 +1,22 @@
+name: Staging
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: staging
+      env_vars: |-
+        SMTP_PORT=587
+        SMTP_FROM=library-of-things-noreply@kcsu.org.uk
+      secret_refs: |-
+        FLASK_SESSION_SECRET_KEY=staging-FLASK_SESSION_SECRET_KEY:latest
+        DATABASE_URL=staging-DATABASE_URL:latest
+        GOOGLE_OAUTH2_CLIENT_ID=staging-GOOGLE_OAUTH2_CLIENT_ID:latest
+        GOOGLE_OAUTH2_CLIENT_SECRET=staging-GOOGLE_OAUTH2_CLIENT_SECRET:latest

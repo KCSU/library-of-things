@@ -1,7 +1,6 @@
-"""CLI entry point and scheduler for due and overdue loan reminders."""
+"""CLI entry point for due and overdue loan reminders."""
 
 import logging
-import time
 import traceback
 from datetime import date, datetime, timedelta
 
@@ -10,7 +9,6 @@ from flask import Flask
 from sqlalchemy.orm import selectinload
 
 from app.common import alerts, mail
-from app.lookup_sync import seconds_until_hour
 
 logger = logging.getLogger(__name__)
 
@@ -75,31 +73,20 @@ def remind_once(dry_run: bool) -> None:
 def register_cli(app: Flask) -> None:
     @app.cli.command('send-reminders')
     @click.option('--dry-run', is_flag=True, help='List the reminders, send nothing.')
-    @click.option('--daily', is_flag=True, help='Stay running and remind once a day.')
     @click.option(
-        '--at',
-        'at_hour',
-        default=2,
-        show_default=True,
-        metavar='HOUR',
-        help='Hour of day (UTC) for --daily.',
+        '--alert',
+        is_flag=True,
+        help='Raise an alert if the reminders fail, for scheduled runs.',
     )
-    def send_reminders_command(dry_run: bool, daily: bool, at_hour: int) -> None:
+    def send_reminders_command(dry_run: bool, alert: bool) -> None:
         """Email borrowers whose loans are due today or overdue."""
-        if not daily:
+        try:
             remind_once(dry_run)
-            return
-
-        logger.info('Reminders scheduled daily at %02d:00 UTC', at_hour)
-        while True:
-            time.sleep(seconds_until_hour(at_hour))
-            try:
-                remind_once(dry_run)
-            except Exception:
-                # A database or mail outage must not kill the scheduler.
-                logger.exception('Scheduled reminders failed')
+        except Exception:
+            if alert:
                 alerts.send(
                     'reminder-job-failed',
                     'Daily loan reminders failed',
                     detail=traceback.format_exc(),
                 )
+            raise

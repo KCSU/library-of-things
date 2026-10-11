@@ -4,32 +4,32 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 from sqlalchemy import create_engine, text
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import URL, Engine
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
 from app.config import (
-    MYSQL_MAX_OVERFLOW,
-    MYSQL_POOL_PRE_PING,
-    MYSQL_POOL_RECYCLE_SEC,
-    MYSQL_POOL_SIZE,
-    MYSQL_POOL_TIMEOUT_SEC,
+    DATABASE_MAX_OVERFLOW,
+    DATABASE_POOL_PRE_PING,
+    DATABASE_POOL_RECYCLE_SEC,
+    DATABASE_POOL_SIZE,
+    DATABASE_POOL_TIMEOUT_SEC,
 )
 
 engine: Engine | None = None
 session_factory: scoped_session[Session] | None = None
 
 
-def init_database(database_url: str) -> Engine:
+def init_database(database_url: str | URL) -> Engine:
     global engine, session_factory
 
     new_engine = create_engine(
         database_url,
         echo=False,
-        pool_pre_ping=MYSQL_POOL_PRE_PING,
-        pool_recycle=MYSQL_POOL_RECYCLE_SEC,
-        pool_size=MYSQL_POOL_SIZE,
-        max_overflow=MYSQL_MAX_OVERFLOW,
-        pool_timeout=MYSQL_POOL_TIMEOUT_SEC,
+        pool_pre_ping=DATABASE_POOL_PRE_PING,
+        pool_recycle=DATABASE_POOL_RECYCLE_SEC,
+        pool_size=DATABASE_POOL_SIZE,
+        max_overflow=DATABASE_MAX_OVERFLOW,
+        pool_timeout=DATABASE_POOL_TIMEOUT_SEC,
     )
 
     with new_engine.connect() as conn:

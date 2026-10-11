@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "kcsu-library-of-things"
+  },
+  "targets": {
+    "kcsu-library-of-things": {
+      "hosting": {
+        "production": ["kcsu-library-of-things"],
+        "staging": ["kcsu-library-of-things-staging"]
+      }
+    }
+  }
+}

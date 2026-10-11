@@ -1,7 +1,8 @@
 import os
-from urllib.parse import quote
 
+import certifi
 from dotenv import load_dotenv
+from sqlalchemy.engine import make_url
 
 load_dotenv()
 
@@ -16,29 +17,28 @@ def required_from_env(key: str) -> str:
 # Flask client-side session cookie signing key
 FLASK_SESSION_SECRET_KEY = required_from_env('FLASK_SESSION_SECRET_KEY')
 
-# MySQL database connection configuration
-MYSQL_HOST = required_from_env('MYSQL_HOST')
-MYSQL_PORT = int(required_from_env('MYSQL_PORT'))
-MYSQL_USERNAME = required_from_env('MYSQL_USERNAME')
-MYSQL_PASSWORD = required_from_env('MYSQL_PASSWORD')
-MYSQL_DATABASE = required_from_env('MYSQL_DATABASE')
-MYSQL_DATABASE_URL = (
-    f'mysql+pymysql://{quote(MYSQL_USERNAME, safe="")}:'
-    f'{quote(MYSQL_PASSWORD, safe="")}'
-    f'@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}'
-)
-MYSQL_POOL_SIZE = 1
-MYSQL_MAX_OVERFLOW = 1
-MYSQL_POOL_TIMEOUT_SEC = 10
-MYSQL_POOL_RECYCLE_SEC = 3600
-MYSQL_POOL_PRE_PING = True
+# Session cookie name.
+SESSION_COOKIE_NAME = '__session'
 
-# Cambridge UIS API Access
-CAMBRIDGE_UIS_API_KEY = required_from_env('CAMBRIDGE_UIS_API_KEY')
-CAMBRIDGE_UIS_API_SECRET = required_from_env('CAMBRIDGE_UIS_API_SECRET')
-LOOKUP_API_URL = os.getenv('LOOKUP_API_URL', 'https://api.apps.cam.ac.uk/lookup/v1')
-LOOKUP_TOKEN_URL = 'https://api.apps.cam.ac.uk/oauth2/v1/token'
-LOOKUP_SCOPE = 'https://api.apps.cam.ac.uk/lookup'
+# SQLAlchemy database URL.
+DATABASE_URL = make_url(required_from_env('DATABASE_URL'))
+if str(DATABASE_URL.query.get('sslmode', '')).startswith('verify') and (
+    'sslrootcert' not in DATABASE_URL.query
+):
+    DATABASE_URL = DATABASE_URL.update_query_dict({'sslrootcert': certifi.where()})
+
+DATABASE_POOL_SIZE = 1
+DATABASE_MAX_OVERFLOW = 1
+DATABASE_POOL_TIMEOUT_SEC = 10
+DATABASE_POOL_RECYCLE_SEC = 3600
+DATABASE_POOL_PRE_PING = True
+
+# Lookup group members that are allowed to sign in.
+LOOKUP_GROUPS = ('kings-sis-ug', 'kings-sis-pg')
+
+# Leave unset to turn push endpoints off.
+PUBSUB_PUSH_SERVICE_ACCOUNT = os.getenv('PUBSUB_PUSH_SERVICE_ACCOUNT')
+PUBSUB_PUSH_AUDIENCE = os.getenv('PUBSUB_PUSH_AUDIENCE', 'library-of-things')
 
 # Google OAuth2 configuration
 GOOGLE_OAUTH2_CLIENT_ID = required_from_env('GOOGLE_OAUTH2_CLIENT_ID')
@@ -51,11 +51,11 @@ GOOGLE_SERVER_METADATA_URL = (
 )
 GOOGLE_SCOPE = 'profile email openid'
 
-# SMTP configuration
-SMTP_HOST = required_from_env('SMTP_HOST')
+# SMTP configuration. Leave SMTP_HOST unset to log emails instead of sending them.
+SMTP_HOST = os.getenv('SMTP_HOST', '')
 SMTP_PORT = int(required_from_env('SMTP_PORT'))
-SMTP_USERNAME = required_from_env('SMTP_USERNAME')
-SMTP_PASSWORD = required_from_env('SMTP_PASSWORD')
+SMTP_USERNAME = os.getenv('SMTP_USERNAME', '')
+SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
 SMTP_FROM = required_from_env('SMTP_FROM')
 ALERTS_TOPIC = os.getenv('ALERTS_TOPIC')
 
@@ -63,5 +63,5 @@ ALERTS_TOPIC = os.getenv('ALERTS_TOPIC')
 IMAGE_MAX_DIMENSION = 1200  # width, height
 IMAGE_QUALITY = 80
 IMAGE_CONTENT_TYPE = 'image/webp'
-IMAGE_MAX_STORED_BYTES = 4 * 1024 * 1024  # 4 MiB
+IMAGE_MAX_STORED_BYTES = 1024 * 1024  # 1 MiB
 IMAGE_MAX_UPLOAD_BYTES = 8 * 1024 * 1024  # 8 MiB

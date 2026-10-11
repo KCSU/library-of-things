@@ -4,13 +4,12 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import TIMESTAMP, DateTime, ForeignKey
+from sqlalchemy import TIMESTAMP, DateTime, ForeignKey, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.common.uuid import new_id
 from app.models.base_model import BaseModel
-from app.models.uuid import UUIDBinary
 
 if TYPE_CHECKING:
     from app.models.item import Item
@@ -22,12 +21,12 @@ _TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
 class Loan(BaseModel):
     __tablename__ = 'loans'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=new_id)
     item_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('items.id'), nullable=False
+        Uuid, ForeignKey('items.id'), nullable=False
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('users.id'), nullable=False
+        Uuid, ForeignKey('users.id'), nullable=False
     )
 
     start_time: Mapped[datetime] = mapped_column(
@@ -40,7 +39,7 @@ class Loan(BaseModel):
 
     # Admin ID if created manually by an admin, None otherwise.
     created_by_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUIDBinary, ForeignKey('users.id'), nullable=True
+        Uuid, ForeignKey('users.id'), nullable=True
     )
 
     item: Mapped[Item] = relationship(back_populates='loans')
@@ -81,12 +80,12 @@ class Loan(BaseModel):
 class Request(BaseModel):
     __tablename__ = 'requests'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=new_id)
     item_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('items.id'), nullable=False
+        Uuid, ForeignKey('items.id'), nullable=False
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUIDBinary, ForeignKey('users.id'), nullable=False
+        Uuid, ForeignKey('users.id'), nullable=False
     )
     request_time: Mapped[datetime] = mapped_column(
         TIMESTAMP, nullable=False, server_default=func.now()

@@ -3,6 +3,7 @@
 import uuid
 from typing import Any
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from app.common.database import db_session
@@ -35,7 +36,12 @@ _ITEM_RELATIONS = (
 def get_all_admin_visible_items() -> list[dict[str, Any]]:
     """Every item, including ones admins have hidden from users."""
     with db_session() as session:
-        items = session.query(Item).options(*_ITEM_RELATIONS).order_by(Item.title).all()
+        items = (
+            session.query(Item)
+            .options(*_ITEM_RELATIONS)
+            .order_by(func.lower(Item.title))
+            .all()
+        )
         return [item.to_dict() for item in items]
 
 
@@ -52,7 +58,7 @@ def get_all_user_visible_items(
         if category:
             query = query.join(Category).filter(Category.category.ilike(category))
 
-        items = [item.to_dict() for item in query.order_by(Item.title)]
+        items = [item.to_dict() for item in query.order_by(func.lower(Item.title))]
         return sorted(items, key=lambda item: item['available_count'] <= 0)
 
 

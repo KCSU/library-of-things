@@ -5,7 +5,6 @@ import traceback
 from collections.abc import Callable
 from datetime import UTC, datetime
 from functools import partial
-from pathlib import Path
 
 from authlib.integrations.flask_client import OAuth
 from flask import (
@@ -25,6 +24,7 @@ from app.common import alerts, database
 from app.common.database import init_database
 from app.common.icons import register_icon_helper
 from app.config import (
+    DATABASE_URL,
     FLASK_SESSION_SECRET_KEY,
     GOOGLE_ACCESS_TOKEN_URL,
     GOOGLE_API_BASE_URL,
@@ -33,9 +33,7 @@ from app.config import (
     GOOGLE_OAUTH2_CLIENT_SECRET,
     GOOGLE_SCOPE,
     GOOGLE_SERVER_METADATA_URL,
-    MYSQL_DATABASE_URL,
 )
-from app.lookup_sync import register_cli
 from app.reminders import register_cli as register_reminders_cli
 
 logger = logging.getLogger(__name__)
@@ -45,8 +43,6 @@ logging.Formatter.converter = time.gmtime
 
 _LOG_FORMAT = '%(asctime)s.%(msecs)03dZ %(levelname)s [%(name)s] %(message)s'
 _LOG_DATEFMT = '%Y-%m-%d %H:%M:%S'
-_LOG_NAME = f'app-{datetime.now(UTC):%Y%m%d-%H%M%S}-{os.getpid()}.log'
-_log_configured = False
 
 ENVIRONMENTS = ('development', 'production')
 
@@ -59,27 +55,15 @@ _FAVICON_ROUTES = {
 _ERROR_PAGES = {400: 'Bad request', 404: 'Not found'}
 
 
-def _configure_logging(root_path: str) -> None:
-    """Log to stderr and to logs/app-<start>-<pid>.log in the project root."""
-    global _log_configured
-    if _log_configured:
-        return
-    _log_configured = True
-
+def _configure_logging() -> None:
+    """Log to stderr."""
     # No-op if the host (e.g. gunicorn) has already configured handlers.
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT, datefmt=_LOG_DATEFMT)
-
-    log_dir = Path(root_path).parent / 'logs'
-    log_dir.mkdir(exist_ok=True)
-    handler = logging.FileHandler(log_dir / _LOG_NAME, encoding='utf-8')
-    handler.setFormatter(logging.Formatter(_LOG_FORMAT, _LOG_DATEFMT))
-    logging.getLogger().addHandler(handler)
-    logger.info('Logging to %s', log_dir / _LOG_NAME)
 
 
 def create_app(config_name: str = 'production') -> Flask:
     app = Flask(__name__)
-    _configure_logging(app.root_path)
+    _configure_logging()
     logger.info("Using '%s' configuration", config_name)
 
     if config_name not in ENVIRONMENTS:
@@ -96,7 +80,7 @@ def create_app(config_name: str = 'production') -> Flask:
     )
 
     try:
-        init_database(MYSQL_DATABASE_URL)
+        init_database(DATABASE_URL)
         logger.info('Database initialised successfully')
     except Exception:
         logger.exception('Database initialisation failed; refusing to start')
@@ -128,7 +112,6 @@ def create_app(config_name: str = 'production') -> Flask:
     register_healthcheck(app)
     register_context_processors(app)
     register_error_handlers(app)
-    register_cli(app)
     register_reminders_cli(app)
 
     return app
@@ -192,6 +175,7 @@ def register_blueprints(app: Flask) -> None:
     from app.services.images.routes import images_bp
     from app.services.items.routes import items_bp
     from app.services.loans.routes import loans_bp
+    from app.services.pubsub.routes import pubsub_bp
     from app.services.settings.routes import settings_bp
     from app.services.users.routes import users_bp
 
@@ -199,6 +183,7 @@ def register_blueprints(app: Flask) -> None:
         auth_bp,
         items_bp,
         loans_bp,
+        pubsub_bp,
         images_bp,
         users_bp,
         settings_bp,

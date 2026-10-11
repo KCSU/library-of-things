@@ -1,0 +1,28 @@
+name: Production
+
+on:
+  push:
+    # semver format only, e.g. v1.2.3
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: production
+      env_vars: |-
+        SMTP_PORT=587
+        SMTP_FROM=library-of-things-noreply@kcsu.org.uk
+        PUBSUB_PUSH_SERVICE_ACCOUNT=lookup-push@kcsu-library-of-things.iam.gserviceaccount.com
+      secret_refs: |-
+        FLASK_SESSION_SECRET_KEY=production-FLASK_SESSION_SECRET_KEY:latest
+        DATABASE_URL=production-DATABASE_URL:latest
+        GOOGLE_OAUTH2_CLIENT_ID=production-GOOGLE_OAUTH2_CLIENT_ID:latest
+        GOOGLE_OAUTH2_CLIENT_SECRET=production-GOOGLE_OAUTH2_CLIENT_SECRET:latest
+        SMTP_HOST=production-SMTP_HOST:latest
+        SMTP_USERNAME=production-SMTP_USERNAME:latest
+        SMTP_PASSWORD=production-SMTP_PASSWORD:latest
+        ALERTS_TOPIC=production-ALERTS_TOPIC:latest

@@ -1,8 +1,6 @@
-"""User and group operations."""
+"""User operations."""
 
 from typing import Any
-
-from sqlalchemy.orm import joinedload
 
 from app.common.database import db_session
 from app.common.timing import log_slow
@@ -11,21 +9,10 @@ from app.models import Audit, Role, User
 
 @log_slow
 def get_all_users() -> list[dict[str, Any]]:
-    """Every user with their group name, ordered by CRSid."""
+    """Every user, ordered by CRSid."""
     with db_session() as session:
-        users = (
-            session.query(User)
-            .options(joinedload(User.group))
-            .order_by(User.crsid)
-            .all()
-        )
-        return [
-            user.to_dict()
-            | {
-                'group': user.group.display_name if user.group else 'Unknown',
-            }
-            for user in users
-        ]
+        users = session.query(User).order_by(User.crsid).all()
+        return [user.to_dict() for user in users]
 
 
 def check_user_access(crsid: str) -> Role | None:

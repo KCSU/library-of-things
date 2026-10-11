@@ -6,12 +6,11 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, String
+from sqlalchemy import JSON, DateTime, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from app.common.uuid import new_id
 from app.models.base_model import BaseModel
-from app.models.uuid import UUIDBinary
 
 _MAX_MESSAGE_LENGTH = 1023
 
@@ -19,7 +18,7 @@ _MAX_MESSAGE_LENGTH = 1023
 class Audit(BaseModel):
     __tablename__ = 'audit'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUIDBinary, primary_key=True, default=new_id)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=new_id)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.now, index=True
     )

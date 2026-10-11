@@ -13,7 +13,7 @@
     <div class="relative">
       {{ icon("search", "icon size-4! absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none") }}
       <input id="user-search" type="search" autocomplete="off"
-        placeholder="CRSid, name or group" autocapitalize="none"
+        placeholder="CRSid or name" autocapitalize="none"
         autocorrect="off" spellcheck="false" class="pl-8!">
     </div>
   </form>
@@ -24,7 +24,6 @@
         <tr>
           <th class="w-24 font-semibold">CRSid</th>
           <th class="w-36 font-semibold">Display Name</th>
-          <th class="w-32 font-semibold">Group</th>
           <th class="w-24 font-semibold">Account Enabled</th>
           {% if can_edit %}
           <th class="w-24 font-semibold text-right!">Actions</th>
@@ -34,11 +33,10 @@
       <tbody>
         {% for row in users %}
         <tr class="user-row"
-          data-search="{{ (row.crsid ~ ' ' ~ row.name ~ ' ' ~ row.group) | lower }}"
+          data-search="{{ (row.crsid ~ ' ' ~ row.name) | lower }}"
           data-crsid="{{ row.crsid }}">
           <td class="font-medium">{{ row.crsid }}</td>
           <td class="text-ellipsis overflow-hidden">{{ row.name }}</td>
-          <td class="text-ellipsis overflow-hidden">{{ row.group }}</td>
           <td>{{ 'Yes' if row.user_enabled else 'No' }}</td>
           {% if can_edit %}
           <td class="text-right">

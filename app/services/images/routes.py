@@ -61,7 +61,7 @@ def item_image(user: dict[str, Any], item_id: UUID) -> ResponseReturnValue:
         mimetype=IMAGE_CONTENT_TYPE,
         headers={
             'ETag': etag,
-            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Cache-Control': 'private, max-age=31536000, immutable',
             'Content-Length': str(len(content)),
         },
     )

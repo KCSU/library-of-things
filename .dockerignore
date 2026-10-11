@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+.env
+logs
+proto
+deploy
+tools
+**/__pycache__
+.ruff_cache
+.pytest_cache
+*.sql
+*.sql.gz
+*.sql.zip

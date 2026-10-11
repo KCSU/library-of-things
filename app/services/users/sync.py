@@ -1,12 +1,16 @@
-"""Reconcile the user table against the Lookup directory."""
+"""Reconcile the user table against Lookup group snapshots from kcsu-admin."""
 
 import logging
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
+
+from sqlalchemy.orm import Session
 
 from app.common.database import db_session
-from app.common.lookup import LookupClient, LookupPerson
 from app.common.timing import log_duration
-from app.models import Audit, Group, Role, User
+from app.config import LOOKUP_GROUPS
+from app.models import Audit, LookupSnapshot, Role, User
+from app.proto.kcsu.lookup.v1.group_snapshot_pb2 import GroupSnapshot
 
 logger = logging.getLogger(__name__)
 
@@ -14,125 +18,145 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SyncReport:
     # All strings are CRSids.
-    created: list[str] = field(default_factory=list)
-    reenabled: list[str] = field(default_factory=list)
-    disabled: list[str] = field(default_factory=list)
-    moved: list[str] = field(default_factory=list)
-    renamed: list[str] = field(default_factory=list)
+    created: set[str] = field(default_factory=set)
+    reenabled: set[str] = field(default_factory=set)
+    disabled: set[str] = field(default_factory=set)
+    renamed: set[str] = field(default_factory=set)
     unchanged: int = 0
-    groups_synced: list[str] = field(default_factory=list)
-    groups_skipped: list[str] = field(default_factory=list)
 
     @property
     def changed(self) -> bool:
-        return bool(
-            self.created
-            or self.reenabled
-            or self.disabled
-            or self.moved
-            or self.renamed
-        )
+        return bool(self.created | self.reenabled | self.disabled | self.renamed)
 
     def summary(self) -> str:
         return (
             f'created={len(self.created)} reenabled={len(self.reenabled)} '
-            f'disabled={len(self.disabled)} moved={len(self.moved)} '
-            f'renamed={len(self.renamed)} unchanged={self.unchanged}'
+            f'disabled={len(self.disabled)} renamed={len(self.renamed)} '
+            f'unchanged={self.unchanged}'
         )
 
 
 @log_duration
-def sync_users(client: LookupClient, dry_run: bool = False) -> SyncReport:
-    """Reconcile every Lookup-backed group. Returns what changed."""
-    report = SyncReport()
+def apply_snapshot(snapshot: GroupSnapshot) -> SyncReport | None:
+    """Store a Lookup group's snapshot, then reconcile the users against every
+    group in LOOKUP_GROUPS. Returns what changed.
+
+    Returns None, changing no users, if the snapshot is no newer than the one
+    already stored, or if a group in LOOKUP_GROUPS has no snapshot yet.
+    """
+    fetched_at = datetime.fromtimestamp(snapshot.fetched_at_unix, UTC).replace(
+        tzinfo=None
+    )
+    members = [
+        {'crsid': crsid, 'name': member.name.strip() or crsid}
+        for member in snapshot.members
+        if (crsid := member.crsid.strip().lower())
+    ]
 
     with db_session() as session:
-        groups = session.query(Group).all()
+        stored = session.get(LookupSnapshot, snapshot.id, with_for_update=True)
+        if stored is not None and stored.fetched_at >= fetched_at:
+            logger.info(
+                'Ignoring snapshot of %s from %s: already have one from %s',
+                snapshot.name,
+                fetched_at,
+                stored.fetched_at,
+            )
+            return None
 
-        # Phase 1: read and parse data from Lookup.
-        memberships: dict[str, list[LookupPerson]] = {}
-        for group in groups:
-            if not group.lookup_type:
-                report.groups_skipped.append(group.name)
-                continue
-            # One app group can draw on several Lookup objects; de-duplicate
-            # by crsid, since a student can appear in more than one.
-            people: dict[str, LookupPerson] = {}
-            for source in (group.lookup_name or group.name).split(','):
-                source = source.strip()
-                if not source:
-                    continue
-                for person in client.members(source, group.lookup_type):
-                    people.setdefault(person.crsid, person)
-            memberships[group.name] = list(people.values())
-            report.groups_synced.append(group.name)
+        # Persist snapshot to database
+        if stored is None:
+            stored = LookupSnapshot(group_id=snapshot.id)
+            session.add(stored)
 
-        if not memberships:
-            logger.warning('No Lookup-backed groups configured; nothing to do')
-            return report
+        stored.name = snapshot.name
+        stored.fetched_at = fetched_at
+        stored.members = members
+        session.flush()
 
-        # crsid -> (group, person), last group wins if somebody is in both
-        directory: dict[str, tuple[Group, LookupPerson]] = {}
-        for group in groups:
-            for lookup_person in memberships.get(group.name, []):
-                directory[lookup_person.crsid] = (group, lookup_person)
+        report = _reconcile(session)
 
-        existing = {user.crsid: user for user in session.query(User).all()}
+    if report is not None:
+        logger.info('Lookup sync after %s: %s', snapshot.name, report.summary())
 
-        # Phase 2: reconcile against database.
-        for crsid, (group, person) in directory.items():
-            user = existing.get(crsid)
-            if user is None:
-                report.created.append(crsid)
-                if not dry_run:
-                    session.add(
-                        User(
-                            crsid=crsid,
-                            name=person.name,
-                            group_id=group.id,
-                            role=Role.USER,
-                            user_enabled=True,
-                            is_manual=False,
-                        )
-                    )
-                continue
+    return report
 
-            if not user.user_enabled:
-                report.reenabled.append(crsid)
-                if not dry_run:
-                    user.user_enabled = True
-            if user.group_id != group.id:
-                report.moved.append(crsid)
-                if not dry_run:
-                    user.group_id = group.id
-            if person.name and user.name != person.name:
-                report.renamed.append(crsid)
-                if not dry_run:
-                    user.name = person.name
-            if (
-                crsid not in report.reenabled
-                and crsid not in report.moved
-                and crsid not in report.renamed
-            ):
-                report.unchanged += 1
 
-        # Anyone Lookup no longer lists should lose access.
-        synced_group_ids = {g.id for g in groups if g.name in memberships}
-        for crsid, user in existing.items():
-            if crsid in directory or user.is_manual:
-                continue
-            if user.group_id not in synced_group_ids:
-                continue  # belongs to a group we didn't sync; leave alone
-            if user.user_enabled:
-                report.disabled.append(crsid)
-                if not dry_run:
-                    user.user_enabled = False
+def _reconcile(session: Session) -> SyncReport | None:
+    report = SyncReport()
+    snapshots = {
+        snapshot.name: snapshot
+        for snapshot in session.query(LookupSnapshot).filter(
+            LookupSnapshot.name.in_(LOOKUP_GROUPS)
+        )
+    }
 
-        # Leave an audit trail if nonempty report.
-        if report.changed and not dry_run:
-            session.add(Audit(message=f'[lookup sync] {report.summary()}'))
+    missing = set(LOOKUP_GROUPS) - snapshots.keys()
+    if missing:
+        # Disabling now would remove everyone in the missing groups. Not an
+        # error, this just means a snapshot of the missing group hasn't arrived.
+        logger.warning(
+            'Refusing to sync: missing snapshot: %s', ', '.join(sorted(missing))
+        )
+        return None
 
-    logger.info(
-        'Lookup sync %s: %s', '(dry run)' if dry_run else 'applied', report.summary()
-    )
+    # crsid -> name, for everyone in any of the groups
+    name_of_crsid = {
+        member['crsid']: member['name']
+        for name in LOOKUP_GROUPS
+        for member in snapshots[name].members
+    }
+    users = {user.crsid: user for user in session.query(User).all()}
+
+    report.created = name_of_crsid.keys() - users.keys()
+    for crsid in report.created:
+        session.add(
+            User(
+                crsid=crsid,
+                name=name_of_crsid[crsid],
+                role=Role.USER,
+                user_enabled=True,
+                is_manual=False,
+            )
+        )
+
+    still_listed = name_of_crsid.keys() & users.keys()
+    for crsid in still_listed:
+        user = users[crsid]
+
+        # User may be previously disabled
+        if not user.user_enabled:
+            report.reenabled.add(crsid)
+            user.user_enabled = True
+
+        # User's display name may have changed
+        if user.name != name_of_crsid[crsid]:
+            report.renamed.add(crsid)
+            user.name = name_of_crsid[crsid]
+
+    report.unchanged = len(still_listed - report.reenabled - report.renamed)
+
+    # Anyone Lookup no longer lists now loses access (except manual users).
+    report.disabled = {
+        crsid
+        for crsid in users.keys() - name_of_crsid.keys()
+        if users[crsid].user_enabled and not users[crsid].is_manual
+    }
+    for crsid in report.disabled:
+        users[crsid].user_enabled = False
+
+    # If there is a change, log it in the audit table.
+    if report.changed:
+        session.add(
+            Audit(
+                message=f'[lookup sync] {report.summary()}',
+                extra={
+                    'created': sorted(report.created),
+                    'reenabled': sorted(report.reenabled),
+                    'disabled': sorted(report.disabled),
+                    'renamed': sorted(report.renamed),
+                },
+            )
+        )
+
     return report
