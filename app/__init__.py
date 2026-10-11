@@ -118,8 +118,8 @@ def create_app(config_name: str = 'production') -> Flask:
 
 
 def register_healthcheck(app: Flask) -> None:
-    @app.route('/healthz')
-    def healthz() -> ResponseReturnValue:
+    @app.route('/api/health')
+    def health() -> ResponseReturnValue:
         if database.engine is None:
             return jsonify(status='error', database='uninitialised'), 503
         try:
