@@ -181,6 +181,10 @@ def register_context_processors(app: Flask) -> None:
             logger.exception('Could not count pending requests')
             return {'pending_requests_count': 0}
 
+    @app.context_processor
+    def inject_current_year() -> dict[str, int]:
+        return {'current_year': datetime.now(UTC).year}
+
 
 def register_blueprints(app: Flask) -> None:
     from app.services.admin.routes import admin_bp
