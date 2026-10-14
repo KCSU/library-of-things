@@ -18,7 +18,7 @@ env:
   PROJECT: kcsu-library-of-things
   REGION: europe-west1
   RUNTIME_SERVICE_ACCOUNT: library-runtime@kcsu-library-of-things.iam.gserviceaccount.com
-  IMAGE: europe-west1-docker.pkg.dev/kcsu-library-of-things/library-of-things/app:${{ github.sha }}
+  IMAGE: europe-west1-docker.pkg.dev/kcsu-library-of-things/library-of-things/app:${{ github.sha }}-${{ inputs.environment }}
 
 defaults:
   run:
@@ -46,8 +46,13 @@ jobs:
 
       - name: Docker Build / Push
         run: |
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            APP_VERSION="$GITHUB_REF_NAME"
+          else
+            APP_VERSION="dev-${GITHUB_SHA::7}"
+          fi
           gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-          docker build --tag "$IMAGE" .
+          docker build --build-arg APP_VERSION="$APP_VERSION" --tag "$IMAGE" .
           docker push "$IMAGE"
 
       - name: Deploy (web app)

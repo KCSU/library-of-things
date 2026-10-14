@@ -13,6 +13,7 @@ def required_from_env(key: str) -> str:
         raise ValueError(f'Missing required environment variable: {key}')
     return value
 
+APP_VERSION = os.getenv('APP_VERSION', 'dev')
 
 # Flask client-side session cookie signing key
 FLASK_SESSION_SECRET_KEY = required_from_env('FLASK_SESSION_SECRET_KEY')
