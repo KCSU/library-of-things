@@ -1,6 +1,6 @@
 # Library of Things
 
-![Version](https://img.shields.io/badge/version-1.1.3-blue)
+![Version](https://img.shields.io/github/v/tag/KCSU/library-of-things?sort=semver&label=version)
 
 A web application for lending items to KCSU members.
 
@@ -30,6 +30,12 @@ cp .env.example .env
 ```sh
 uv run python -m app.run
 ```
+
+## Deployment
+
+Pushing to `main` deploys to [staging](https://staging.library.kcsu.org.uk).
+
+Pushing a version tag, such as v1.2.0, deploys to [production](https://staging.library.kcsu.org.uk).
 
 ## Development
 
