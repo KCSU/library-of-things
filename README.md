@@ -35,7 +35,7 @@ uv run python -m app.run
 
 Pushing to `main` deploys to [staging](https://staging.library.kcsu.org.uk).
 
-Pushing a version tag, such as v1.2.0, deploys to [production](https://staging.library.kcsu.org.uk).
+Pushing a version tag, such as v1.2.0, deploys to [production](https://library.kcsu.org.uk).
 
 ## Development
 
