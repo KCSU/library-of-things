@@ -30,9 +30,10 @@
             <label for="item-image">Image</label>
             <img id="item-image-preview" alt="Current image" hidden
                  class="aspect-video object-cover rounded max-h-44 w-full">
-            <input type="file" id="item-image" accept="image/*">
+            <input type="file" id="item-image" accept="image/*"
+                   data-max-bytes="{{ config.IMAGE_MAX_UPLOAD_BYTES }}">
             <span class="text-sm text-gray-400">
-              Converted to WebP automatically. Max 8MB.
+              Converted to WebP automatically. Max {{ config.IMAGE_MAX_UPLOAD_BYTES // (1024 * 1024) }}MB.
             </span>
           </div>
 

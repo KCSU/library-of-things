@@ -83,10 +83,11 @@ function dismissOverlay() {
 }
 
 function post(url, body) {
+  const isForm = body instanceof FormData;
   return fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: body === undefined ? undefined : JSON.stringify(body)
+    headers: isForm ? {} : { 'Content-Type': 'application/json' },
+    body: isForm || body === undefined ? body : JSON.stringify(body)
   })
     .then(res => res.json().catch(() => ({})).then(result => ({ res, result })))
     .then(({ res, result }) => {

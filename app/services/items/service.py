@@ -7,8 +7,10 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from app.common.database import db_session
+from app.common.images import WebPImageBytes
 from app.common.timing import log_slow
 from app.models import Audit, Category, Item
+from app.services.images import service as image_service
 from app.services.items.schemas import ItemInput
 
 # Columns whose edits are recorded in the audit entry's extra.
@@ -74,12 +76,16 @@ def _shown(session: Session, field: str, value: Any) -> str:
     return str(value)
 
 
-def create_item(data: ItemInput, acting_crsid: str) -> uuid.UUID:
+def create_item(
+    data: ItemInput, acting_crsid: str, image: WebPImageBytes | None = None
+) -> uuid.UUID:
     with db_session() as session:
         item = Item()
         item.update_from_dict(data.model_dump())
         session.add(item)
         session.flush()
+        if image is not None:
+            image_service.save(session, item.id, image)
         session.add(
             Audit(
                 actor_crsid=acting_crsid,
@@ -90,11 +96,18 @@ def create_item(data: ItemInput, acting_crsid: str) -> uuid.UUID:
         return item.id
 
 
-def update_item(item_id: uuid.UUID, data: ItemInput, acting_crsid: str) -> bool:
+def update_item(
+    item_id: uuid.UUID,
+    data: ItemInput,
+    acting_crsid: str,
+    image: WebPImageBytes | None = None,
+) -> bool:
     with db_session() as session:
         item = session.query(Item).filter(Item.id == item_id).first()
         if not item:
             return False
+        if image is not None:
+            image_service.save(session, item_id, image)
 
         new_data = data.model_dump()
         fields = [f for f in _AUDITED_FIELDS if f in new_data]

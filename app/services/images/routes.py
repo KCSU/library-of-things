@@ -9,30 +9,9 @@ from flask.typing import ResponseReturnValue
 from app.common.auth import role_required
 from app.config import IMAGE_CONTENT_TYPE
 from app.models import Role
-from app.services.images import files as file_service
 from app.services.images import service as image_service
 
 images_bp = Blueprint('images', __name__)
-
-
-@images_bp.route('/admin/api/items/<uuid:item_id>/image', methods=['POST'])
-@role_required(Role.LIBRARIAN)
-def api_upload_item_image(user: dict[str, Any], item_id: UUID) -> ResponseReturnValue:
-    """Replace an item's image. Admin only."""
-    try:
-        content = file_service.read_upload(request.files.get('image'))
-    except ValueError as exc:
-        return jsonify({'error': str(exc)}), 400
-
-    try:
-        stored = image_service.store(item_id, content)
-    except ValueError as exc:
-        return jsonify({'error': f'Unsupported image: {exc}'}), 400
-
-    if stored is None:
-        return jsonify({'error': 'Item not found'}), 404
-
-    return jsonify({'success': True, **stored})
 
 
 @images_bp.route('/admin/api/items/<uuid:item_id>/image', methods=['DELETE'])

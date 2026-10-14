@@ -22,13 +22,22 @@ $(document).ready(function () {
       return;
     }
 
+    // Check the image's size before uploading it
+    const imageError = chosenImageError();
+    if (imageError) {
+      alert(imageError);
+      return;
+    }
+
     const endpoint = itemId ? '/admin/api/edit_item' : '/admin/api/new_item';
     const payload = itemId ? { id: itemId, data } : { data };
 
-    post(endpoint, payload)
-      // The image is a separate multipart request: it needs an item id,
-      // which a new item only has once it has been saved.
-      .then(result => uploadImageIfChosen(itemId || result.id))
+    const body = new FormData();
+    body.append('payload', JSON.stringify(payload));
+    const file = $('#item-image')[0]?.files?.[0];
+    if (file) body.append('image', file);
+
+    post(endpoint, body)
       .then(() => {
         dismissOverlay();
         location.reload();
@@ -121,20 +130,16 @@ function populateLoanTerms(item) {
   updateLoanModeFields();
 }
 
-function uploadImageIfChosen(itemId) {
-  const file = $('#item-image')[0]?.files?.[0];
-  if (!file || !itemId) return Promise.resolve();
-
-  const body = new FormData();
-  body.append('image', file);
-
-  return fetch(`/admin/api/items/${itemId}/image`, { method: 'POST', body })
-    .then(res => res.json().then(result => {
-      if (!res.ok || !result.success) {
-        throw new Error('Image upload failed: ' +
-                        (result.error || res.status));
-      }
-    }));
+function chosenImageError() {
+  const input = $('#item-image')[0];
+  const file = input?.files?.[0];
+  const maxBytes = Number(input?.dataset.maxBytes);
+  if (file && maxBytes && file.size > maxBytes) {
+    const mb = bytes => (bytes / (1024 * 1024)).toFixed(1);
+    return `The image is ${mb(file.size)}MB; the limit is ` +
+           `${mb(maxBytes)}MB. Please choose a smaller image.`;
+  }
+  return null;
 }
 
 function showImagePreview(item) {
