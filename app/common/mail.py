@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 _SMTP_TIMEOUT_SEC = 10
 _SUBJECT_PREFIX = 'Subject: '
+_SMTP_LOCAL_HOSTNAME = 'kcsu.org.uk'
 
 
 @dataclass(frozen=True)
@@ -56,7 +57,12 @@ def send(*emails: Email) -> int:
 
     sent = 0
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=_SMTP_TIMEOUT_SEC) as smtp:
+        with smtplib.SMTP(
+            SMTP_HOST,
+            SMTP_PORT,
+            local_hostname=_SMTP_LOCAL_HOSTNAME,
+            timeout=_SMTP_TIMEOUT_SEC,
+        ) as smtp:
             smtp.starttls(context=ssl.create_default_context())
             if SMTP_USERNAME and SMTP_PASSWORD:
                 smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
