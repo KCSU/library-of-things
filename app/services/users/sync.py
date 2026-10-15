@@ -74,7 +74,7 @@ def apply_snapshot(snapshot: GroupSnapshot) -> SyncReport | None:
         stored.members = members
         session.flush()
 
-        report = _reconcile(session)
+        report = _reconcile(session, snapshot.name)
 
     if report is not None:
         logger.info('Lookup sync after %s: %s', snapshot.name, report.summary())
@@ -82,7 +82,7 @@ def apply_snapshot(snapshot: GroupSnapshot) -> SyncReport | None:
     return report
 
 
-def _reconcile(session: Session) -> SyncReport | None:
+def _reconcile(session: Session, group: str) -> SyncReport | None:
     report = SyncReport()
     snapshots = {
         snapshot.name: snapshot
@@ -151,6 +151,7 @@ def _reconcile(session: Session) -> SyncReport | None:
             Audit(
                 message=f'[lookup sync] {report.summary()}',
                 extra={
+                    'group': group,
                     'created': sorted(report.created),
                     'reenabled': sorted(report.reenabled),
                     'disabled': sorted(report.disabled),
