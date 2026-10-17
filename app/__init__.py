@@ -128,7 +128,7 @@ def register_healthcheck(app: Flask) -> None:
         except Exception as exc:
             logger.warning('Healthcheck database probe failed: %s', exc)
             return jsonify(status='error', database='unreachable'), 503
-        return jsonify(status='ok', database='ok'), 200
+        return jsonify(status='ok'), 200
 
 
 def register_favicon_routes(app: Flask) -> None:
