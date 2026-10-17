@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scrollbar-gutter: stable;
+}
+
 .lightbox-overlay {
   position: fixed;
   top: 0;
