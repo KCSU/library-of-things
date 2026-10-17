@@ -36,6 +36,7 @@
   <section class="grid gap-4">
     <h3 class="text-lg font-medium">Current staff</h3>
     {% if staff %}
+    <div class="overflow-x-auto">
     <table class="table table-fixed w-full">
       <thead>
         <tr>
@@ -53,9 +54,9 @@
           <td>{{ member.role_label }}</td>
           <td>
             {% if member.crsid == user.crsid %}
-            <span class="text-gray-500 text-sm">That's you</span>
+            <span class="inline-flex items-center h-9 text-gray-500 text-sm">That's you</span>
             {% else %}
-            <select class="role-select" data-crsid="{{ member.crsid }}">
+            <select class="select role-select" data-crsid="{{ member.crsid }}">
               {% for role in all_roles %}
               <option value="{{ role.value }}"
                 {{ 'selected' if role.value == member.role }}>{{ role.label }}</option>
@@ -67,6 +68,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% else %}
     <p class="text-gray-500">Nobody holds an admin role.</p>
     {% endif %}

@@ -23,20 +23,20 @@
   <div id="audit-results">
   {% if entries %}
   <div class="overflow-x-auto">
-    <table class="table table-fixed w-full text-sm">
-      <thead>
+    <table class="table table-fixed w-full text-sm max-md:block">
+      <thead class="max-md:hidden">
         <tr>
           <th class="w-48 font-semibold">When</th>
           <th class="w-32 font-semibold">Who</th>
           <th class="font-semibold">What</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="max-md:block">
         {% for entry in entries %}
-        <tr>
-          <td class="text-gray-600">{{ entry.when }}</td>
-          <td class="font-medium">{{ entry.actor }}</td>
-          <td class="text-ellipsis overflow-hidden">
+        <tr class="max-md:grid max-md:grid-cols-[auto_1fr] max-md:py-1">
+          <td class="text-gray-500 max-md:pb-0">{{ entry.when }}</td>
+          <td class="font-medium max-md:pb-0">{{ entry.actor }}</td>
+          <td class="text-ellipsis overflow-hidden max-md:col-span-2 max-md:whitespace-normal max-md:break-words">
             {% if entry.extra %}
             <details class="group">
               <summary class="flex items-center justify-between gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
