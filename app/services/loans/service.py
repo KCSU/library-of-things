@@ -130,7 +130,12 @@ def refuse_request(request_id: uuid.UUID, reason: str, acting_crsid: str) -> boo
             'reason': reason,
         }
         refused = (
-            mail.render('request_refused.txt', to=req.user.email, request=req)
+            mail.render(
+                'request_refused.txt',
+                to=req.user.email,
+                extra={**extra, 'request_id': str(req.id)},
+                request=req,
+            )
             if send_email
             else None
         )
@@ -255,6 +260,12 @@ def approve_request(request_id: uuid.UUID, acting_crsid: str) -> dict[str, Any]:
             mail.render(
                 'request_approved.txt',
                 to=req.user.email,
+                extra={
+                    'user_id': str(req.user_id),
+                    'user_crsid': req.user.crsid,
+                    'item_id': str(req.item_id),
+                    'loan_id': str(loan_id),
+                },
                 loan=session.get(Loan, loan_id),
             )
             if send_email

@@ -51,6 +51,12 @@ def collect_reminders(today: date) -> list[mail.Email]:
                 mail.render(
                     f'{email}.txt',
                     to=loan.user.email,
+                    extra={
+                        'user_id': str(loan.user_id),
+                        'user_crsid': loan.user.crsid,
+                        'item_id': str(loan.item_id),
+                        'loan_id': str(loan.id),
+                    },
                     loan=loan,
                     days_overdue=days_overdue,
                 )

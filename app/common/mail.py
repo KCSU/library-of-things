@@ -7,7 +7,7 @@ import logging
 import smtplib
 import ssl
 import traceback
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from email.message import EmailMessage
 from email.utils import formatdate, make_msgid
 from typing import Any
@@ -15,7 +15,9 @@ from typing import Any
 from flask import current_app
 
 from app.common import alerts
+from app.common.database import db_session
 from app.config import SMTP_FROM, SMTP_HOST, SMTP_PASSWORD, SMTP_PORT, SMTP_USERNAME
+from app.models import Audit
 
 logger = logging.getLogger(__name__)
 
@@ -29,19 +31,32 @@ class Email:
     to: str
     subject: str
     body: str
+    template: str = ''
+    extra: dict[str, Any] = field(default_factory=dict)
 
 
-def render(template: str, to: str, **context: Any) -> Email:
+def render(
+    template: str, to: str, *, extra: dict[str, Any] | None = None, **context: Any
+) -> Email:
     """Render templates/email/<template>."""
     text = current_app.jinja_env.get_template(f'email/{template}').render(**context)
     first_line, _, body = text.partition('\n')
     if not first_line.startswith(_SUBJECT_PREFIX):
         raise ValueError(f'Email template {template} must start with a Subject line')
-    return Email(to=to, subject=first_line.removeprefix(_SUBJECT_PREFIX), body=body)
+    return Email(
+        to=to,
+        subject=first_line.removeprefix(_SUBJECT_PREFIX),
+        body=body,
+        template=template,
+        extra=extra or {},
+    )
 
 
 def send(*emails: Email) -> int:
-    """Send emails over a single connection, and return how many were accepted."""
+    """Send emails over a single connection, and return how many were accepted.
+
+    Each accepted email gets a system entry in the audit log.
+    """
     if not emails:
         return 0
 
@@ -55,7 +70,7 @@ def send(*emails: Email) -> int:
             )
         return 0
 
-    sent = 0
+    sent: list[tuple[Email, str]] = []  # with the Message-ID
     try:
         with smtplib.SMTP(
             SMTP_HOST,
@@ -68,21 +83,46 @@ def send(*emails: Email) -> int:
                 smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
             for email in emails:
                 try:
-                    smtp.send_message(_to_message(email))
-                    sent += 1
+                    message = _to_message(email)
+                    smtp.send_message(message)
+                    sent.append((email, message['Message-ID']))
                 except smtplib.SMTPException:
                     logger.exception('Could not send %r to %s', email.subject, email.to)
     except OSError:  # includes SMTPException
         logger.exception('SMTP session with %s:%d failed', SMTP_HOST, SMTP_PORT)
         alerts.send(
             'email-failed',
-            f'Could not send {len(emails) - sent} of {len(emails)} emails',
+            f'Could not send {len(emails) - len(sent)} of {len(emails)} emails',
             detail=traceback.format_exc(),
             smtp_host=SMTP_HOST,
         )
 
-    logger.info('Sent %d of %d emails', sent, len(emails))
-    return sent
+    logger.info('Sent %d of %d emails', len(sent), len(emails))
+    _audit(sent)
+    return len(sent)
+
+
+def _audit(sent: list[tuple[Email, str]]) -> None:
+    """Record sent emails in the audit log."""
+    if not sent:
+        return
+    try:
+        with db_session() as session:
+            session.add_all(
+                Audit(
+                    actor_crsid=None,
+                    message=f'Emailed {email.to}: {email.subject}',
+                    extra={
+                        **email.extra,
+                        'template': email.template,
+                        'to': email.to,
+                        'message_id': message_id,
+                    },
+                )
+                for email, message_id in sent
+            )
+    except Exception:
+        logger.exception('Could not audit %d sent emails', len(sent))
 
 
 def _to_message(email: Email) -> EmailMessage:
