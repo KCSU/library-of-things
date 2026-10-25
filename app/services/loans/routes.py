@@ -9,6 +9,7 @@ from flask.typing import ResponseReturnValue
 
 from app.common.api import json_errors, json_uuid
 from app.common.auth import role_required
+from app.common.timing import LONDON
 from app.models import Role
 from app.services.items import service as item_service
 from app.services.loans import service as loan_service
@@ -125,6 +126,8 @@ def api_lend(user: dict[str, Any]) -> ResponseReturnValue:
             start_time = datetime.fromisoformat(raw_start)
         except ValueError:
             return jsonify({'error': 'Start date is not a valid date'}), 400
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=LONDON)
 
     result = loan_service.lend_to_user(
         item_id, crsid, admin_crsid=user['crsid'], start_time=start_time

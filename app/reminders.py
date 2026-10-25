@@ -9,6 +9,7 @@ from flask import Flask
 from sqlalchemy.orm import selectinload
 
 from app.common import alerts, mail
+from app.common.timing import LONDON, london_today
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,9 @@ def collect_reminders(today: date) -> list[mail.Email]:
         logger.info('Due and overdue emails are turned off; nothing to send')
         return []
 
-    tomorrow = datetime.combine(today + timedelta(days=1), datetime.min.time())
+    tomorrow = datetime.combine(
+        today + timedelta(days=1), datetime.min.time(), tzinfo=LONDON
+    )
     with db_session() as session:
         loans = (
             session.query(Loan)
@@ -43,7 +46,7 @@ def collect_reminders(today: date) -> list[mail.Email]:
         emails = []
         for loan in loans:
             assert loan.due_date is not None  # filtered above
-            days_overdue = (today - loan.due_date.date()).days
+            days_overdue = (today - loan.due_date.astimezone(LONDON).date()).days
             email = 'loan_overdue' if days_overdue > 0 else 'loan_due'
             if not enabled[email]:
                 continue
@@ -65,7 +68,7 @@ def collect_reminders(today: date) -> list[mail.Email]:
 
 
 def remind_once(dry_run: bool) -> None:
-    emails = collect_reminders(date.today())
+    emails = collect_reminders(london_today())
     if dry_run:
         for email in emails:
             click.echo(f'  {email.to}: {email.subject}')

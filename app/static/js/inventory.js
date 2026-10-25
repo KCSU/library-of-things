@@ -119,6 +119,13 @@ function loanTermsFromForm() {
 }
 
 function populateLoanTerms(item) {
+  if (!item.id) {
+    // New items default to being returned by the end of 30 June, every year.
+    const now = new Date();
+    const year = now.getFullYear() + (now.getMonth() >= 6 ? 1 : 0);
+    item = { loan_end_date: `${year}-06-30`, loan_end_recurs_annually: true };
+  }
+
   let mode = 'permanent';
   if (item.loan_duration_days != null) mode = 'duration';
   else if (item.loan_end_date) mode = 'end_date';

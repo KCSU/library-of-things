@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.common.timing import LONDON
 from app.common.uuid import new_id
 from app.models.base_model import BaseModel
 
@@ -109,8 +110,8 @@ class Item(BaseModel):
         if self.loan_end_date is not None:
             end = self.loan_end_date
             if self.loan_end_recurs_annually:
-                end = _next_occurrence(end, start_time.date())
-            return datetime.datetime.combine(end, datetime.time.max)
+                end = _next_occurrence(end, start_time.astimezone(LONDON).date())
+            return datetime.datetime.combine(end, datetime.time.max, tzinfo=LONDON)
 
         return None  # no due date
 

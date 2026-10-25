@@ -1,7 +1,7 @@
 Subject: [KCSU Library of Things] Your loan of {{ loan.item.title }} is overdue
 Dear {{ loan.user.name }},
 
-Your loan of the item "{{ loan.item.title }}" was due on {{ loan.due_date.strftime('%A') }} {{ loan.due_date.day }} {{ loan.due_date.strftime('%B %Y') }}, and is now {{ days_overdue }} day{{ 's' if days_overdue != 1 }} overdue. Please return it as soon as possible.
+Your loan of the item "{{ loan.item.title }}" was due on {{ (loan.due_date | london).strftime('%A') }} {{ (loan.due_date | london).day }} {{ (loan.due_date | london).strftime('%B %Y') }}, and is now {{ days_overdue }} day{{ 's' if days_overdue != 1 }} overdue. Please return it as soon as possible.
 
 When returning your item, please place it in the Returns Box in the JCR, clearly identified with your CRSid legibly written.
 

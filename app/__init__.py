@@ -20,7 +20,7 @@ from flask_talisman import Talisman
 from sqlalchemy import text
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from app.common import alerts, database
+from app.common import alerts, database, timing
 from app.common.database import init_database
 from app.common.icons import register_icon_helper
 from app.config import (
@@ -105,6 +105,8 @@ def create_app(config_name: str = 'production') -> Flask:
         )
     except Exception:
         logger.exception('Google OAuth failed to initialize; refusing to start')
+
+    app.add_template_filter(lambda when: when.astimezone(timing.LONDON), 'london')
 
     register_icon_helper(app)
     register_blueprints(app)

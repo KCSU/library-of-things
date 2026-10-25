@@ -8,7 +8,7 @@ If your item is commonplace (a bowl, plate, cutlery, frying pan or saucepan) the
 For all other items, please check the Collections Box and retrieve the item which should be clearly identified with your CRSid.
 
 {% if loan.due_date -%}
-Please return the item by {{ loan.due_date.strftime('%A') }} {{ loan.due_date.day }} {{ loan.due_date.strftime('%B %Y') }}. You can return it at any time before then by arrangement.
+Please return the item by {{ (loan.due_date | london).strftime('%A') }} {{ (loan.due_date | london).day }} {{ (loan.due_date | london).strftime('%B %Y') }}. You can return it at any time before then by arrangement.
 
 When returning your item, please place it in the Returns Box, clearly identified with your CRSid legibly written.
 {%- else -%}

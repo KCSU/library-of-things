@@ -7,6 +7,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Query, Session
 
 from app.common.database import db_session
+from app.common.timing import format_london
 from app.models import Audit
 
 PAGE_SIZE = 20
@@ -42,7 +43,7 @@ def get_audit_log(page: int = 1, search: str = '') -> list[dict[str, Any]]:
         )
         return [
             {
-                'when': row.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'when': format_london(row.created_at),
                 'actor': row.actor_crsid or 'system',
                 'message': row.message,
                 'extra': (

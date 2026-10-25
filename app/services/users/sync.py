@@ -44,9 +44,7 @@ def apply_snapshot(snapshot: GroupSnapshot) -> SyncReport | None:
     Returns None, changing no users, if the snapshot is no newer than the one
     already stored, or if a group in LOOKUP_GROUPS has no snapshot yet.
     """
-    fetched_at = datetime.fromtimestamp(snapshot.fetched_at_unix, UTC).replace(
-        tzinfo=None
-    )
+    fetched_at = datetime.fromtimestamp(snapshot.fetched_at_unix, UTC)
     members = [
         {'crsid': crsid, 'name': member.name.strip() or crsid}
         for member in snapshot.members

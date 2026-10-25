@@ -1,8 +1,10 @@
+import datetime
 import logging
 import time
 from collections.abc import Callable
 from functools import wraps
 from typing import Any
+from zoneinfo import ZoneInfo
 
 
 def log_slow(arg: Callable[..., Any] | float = 1.0) -> Callable[..., Any]:
@@ -34,3 +36,19 @@ def log_slow(arg: Callable[..., Any] | float = 1.0) -> Callable[..., Any]:
 
 # For work whose duration is worth knowing every time.
 log_duration = log_slow(0.0)
+
+
+# Times are stored timezone-aware (UTC in the database) and shown in UK time.
+LONDON = ZoneInfo('Europe/London')
+
+
+def utcnow() -> datetime.datetime:
+    return datetime.datetime.now(datetime.UTC)
+
+
+def london_today() -> datetime.date:
+    return datetime.datetime.now(LONDON).date()
+
+
+def format_london(when: datetime.datetime | None) -> str | None:
+    return when.astimezone(LONDON).strftime('%Y-%m-%d %H:%M:%S') if when else None

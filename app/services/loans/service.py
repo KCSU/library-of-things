@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.common import mail
 from app.common.database import db_session
+from app.common.timing import utcnow
 from app.models import Audit, Item, Loan, Request, User
 from app.services.settings import service as settings_service
 
@@ -40,7 +41,7 @@ def _create_loan(
         raise ValueError('No copies available to lend')
 
     # May be backdated when an admin records a loan that already happened.
-    start_time = start_time or datetime.now()
+    start_time = start_time or utcnow()
     loan = Loan(
         item_id=item_id,
         user_id=user_id,
@@ -62,7 +63,7 @@ def end_loan(
         loan = session.query(Loan).filter(Loan.id == loan_id).first()
         if loan is None or loan.returned_at is not None:
             return False
-        loan.returned_at = returned_at or datetime.now()
+        loan.returned_at = returned_at or utcnow()
         session.add(
             Audit(
                 actor_crsid=acting_crsid,
@@ -107,9 +108,7 @@ def request_item(item_id: uuid.UUID, user_session: dict[str, Any]) -> bool:
         if existing:
             raise ValueError('You already have a pending request for this item')
 
-        session.add(
-            Request(item_id=item_id, user_id=user.id, request_time=datetime.now())
-        )
+        session.add(Request(item_id=item_id, user_id=user.id, request_time=utcnow()))
 
     return True
 
@@ -289,7 +288,7 @@ def lend_to_user(
     item_id: uuid.UUID, crsid: str, admin_crsid: str, start_time: datetime | None = None
 ) -> dict[str, Any]:
     """Record a loan an admin has handed over in person."""
-    if start_time and start_time > datetime.now():
+    if start_time and start_time > utcnow():
         return {'success': False, 'error': 'Start date cannot be in the future'}
 
     with db_session() as session:

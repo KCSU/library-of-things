@@ -17,7 +17,9 @@ class LookupSnapshot(BaseModel):
     group_id: Mapped[str] = mapped_column(String(32), primary_key=True)
     # Lookup's group name, e.g. 'kings-sis-ug'.
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    # When kcsu-admin read it from Lookup, in UTC.
-    fetched_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    # When kcsu-admin read it from Lookup.
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
     # [{'crsid': ..., 'name': ...}, ...]
     members: Mapped[list[dict[str, str]]] = mapped_column(JSON, nullable=False)

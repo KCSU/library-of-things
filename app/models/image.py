@@ -17,6 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.common.timing import utcnow
 from app.common.uuid import new_id
 from app.models.base_model import BaseModel
 
@@ -42,7 +43,7 @@ class ItemImage(BaseModel):
     # sha256 hash of the content
     checksum: Mapped[str] = mapped_column(String(64), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.now
+        DateTime(timezone=True), nullable=False, default=utcnow
     )
 
     item: Mapped[Item] = relationship(back_populates='image')
