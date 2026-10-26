@@ -23,6 +23,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from app.common import alerts, database, timing
 from app.common.database import init_database
 from app.common.icons import register_icon_helper
+from app.common.logs import JsonFormatter, on_cloud_run
 from app.config import (
     DATABASE_URL,
     FLASK_SESSION_SECRET_KEY,
@@ -56,9 +57,17 @@ _ERROR_PAGES = {400: 'Bad request', 404: 'Not found'}
 
 
 def _configure_logging() -> None:
-    """Log to stderr."""
+    """Log to stderr as JSON lines on Cloud Run."""
     # No-op if the host (e.g. gunicorn) has already configured handlers.
-    logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT, datefmt=_LOG_DATEFMT)
+    if on_cloud_run():
+        handler = logging.StreamHandler()
+        handler.setFormatter(JsonFormatter())
+        logging.basicConfig(level=logging.INFO, handlers=[handler])
+    else:
+        logging.basicConfig(
+            level=logging.INFO, format=_LOG_FORMAT, datefmt=_LOG_DATEFMT
+        )
+    logging.captureWarnings(True)
 
 
 def create_app(config_name: str = 'production') -> Flask:
@@ -104,7 +113,13 @@ def create_app(config_name: str = 'production') -> Flask:
             client_kwargs={'scope': GOOGLE_SCOPE},
         )
     except Exception:
-        logger.exception('Google OAuth failed to initialize; refusing to start')
+        logger.exception('Google OAuth failed to initialise; refusing to start')
+        alerts.send(
+            'startup-failed',
+            'Library of Things failed to start: Google sign-in could not be set up',
+            detail=traceback.format_exc(),
+        )
+        raise
 
     app.add_template_filter(lambda when: when.astimezone(timing.LONDON), 'london')
 

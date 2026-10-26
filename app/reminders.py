@@ -1,6 +1,7 @@
 """CLI entry point for due and overdue loan reminders."""
 
 import logging
+import sys
 import traceback
 from datetime import date, datetime, timedelta
 
@@ -75,8 +76,7 @@ def remind_once(dry_run: bool) -> None:
         click.echo(f'DRY RUN - {len(emails)} reminders, none sent')
         return
 
-    sent = mail.send(*emails)
-    click.echo(f'Sent {sent} of {len(emails)} reminders')
+    mail.send(*emails)
 
 
 def register_cli(app: Flask) -> None:
@@ -92,10 +92,11 @@ def register_cli(app: Flask) -> None:
         try:
             remind_once(dry_run)
         except Exception:
+            logger.exception('Daily loan reminders failed')
             if alert:
                 alerts.send(
                     'reminder-job-failed',
                     'Daily loan reminders failed',
                     detail=traceback.format_exc(),
                 )
-            raise
+            sys.exit(1)

@@ -15,6 +15,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --frozen --no-dev
 
+COPY gunicorn.conf.py ./
 COPY app ./app
 
 ARG APP_VERSION=dev
@@ -23,4 +24,4 @@ ENV APP_VERSION=$APP_VERSION
 RUN useradd --system --no-create-home app
 USER app
 
-CMD ["sh", "-c", "exec gunicorn --workers 2 --bind :${PORT:-8080} --log-file - app.run:app"]
+CMD ["sh", "-c", "exec gunicorn --workers 2 --bind :${PORT:-8080} app.run:app"]
