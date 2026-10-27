@@ -11,7 +11,7 @@ dependencies = [
     "gunicorn==22.0.0",
     "python-dotenv==1.2.2",
     "SQLAlchemy==2.0.44",
-    "requests==2.32.4",
+    "requests==2.33.0",
     "pillow>=12.3.0",
     "protobuf==7.36.2",
     "google-auth==2.61.0",
