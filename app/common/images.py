@@ -35,7 +35,7 @@ def encode(raw: bytes) -> WebPImageBytes:
         source = ImageOps.exif_transpose(source)
         source.load()
     except Exception as exc:
-        raise ValueError(f'Image unreadable: {exc}') from exc
+        raise ValueError('File is not a recognised image.') from exc
 
     # Convert to opaque RGB
     if source.mode in ('RGBA', 'LA') or 'transparency' in source.info:
