@@ -82,10 +82,10 @@ function dismissOverlay() {
   $('body').css('overflow', ''); // Re-enable background scrolling
 }
 
-function post(url, body) {
+function post(url, body, method = 'POST') {
   const isForm = body instanceof FormData;
   return fetch(url, {
-    method: 'POST',
+    method,
     headers: isForm ? {} : { 'Content-Type': 'application/json' },
     body: isForm || body === undefined ? body : JSON.stringify(body)
   })

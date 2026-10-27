@@ -1,7 +1,7 @@
 {% extends "sidebar.html" %}
 {% block content %}
 
-<div class="fixed top-0 left-0 w-full h-full z-99 bg-black/30 backdrop-blur-sm cursor-pointer transition-opacity duration-300 overlay hidden opacity-0" id="confirm-overlay" onclick="dismissOverlay()">
+<div class="fixed top-0 left-0 w-full h-full z-99 bg-black/30 backdrop-blur-sm cursor-pointer transition-opacity duration-300 overlay hidden opacity-0" id="confirm-overlay" onclick="closeItemForm()">
   <div class="flex items-center justify-center h-full w-full">
     <div class="card w-[90%] md:max-w-xl mb-5 border cursor-default max-h-5/6 overflow-y-auto" onclick="event.stopPropagation()">
       <header class="edit-item-contents">
@@ -28,13 +28,18 @@
 
           <div class="grid gap-2">
             <label for="item-image">Image</label>
-            <img id="item-image-preview" alt="Current image" hidden
-                 class="aspect-video object-cover rounded max-h-44 w-full">
-            <input type="file" id="item-image" accept="image/*"
-                   data-max-bytes="{{ config.IMAGE_MAX_UPLOAD_BYTES }}">
-            <span class="text-sm text-gray-400">
-              Converted to WebP automatically. Max {{ config.IMAGE_MAX_UPLOAD_BYTES // (1024 * 1024) }}MB.
-            </span>
+            <div id="item-image-current" class="grid gap-2" hidden>
+              <img id="item-image-preview" alt="Current image"
+                   class="aspect-video object-cover rounded max-h-44 w-full">
+              <button type="button" onclick="removeItemImage()" class="btn-sm-secondary w-fit">Remove image</button>
+            </div>
+            <div id="item-image-upload" class="grid gap-2">
+              <input type="file" id="item-image" accept="image/*"
+                     data-max-bytes="{{ config.IMAGE_MAX_UPLOAD_BYTES }}">
+              <span class="text-sm text-gray-400">
+                Converted to WebP automatically. Max {{ config.IMAGE_MAX_UPLOAD_BYTES // (1024 * 1024) }}MB.
+              </span>
+            </div>
           </div>
 
           <div class="grid gap-2">
@@ -91,7 +96,7 @@
           </div>
 
           <div class="flex justify-between">
-            <button type="button" onclick="dismissOverlay()" class="btn btn-secondary">Cancel</button>
+            <button type="button" onclick="closeItemForm()" class="btn btn-secondary">Cancel</button>
             <button type="submit" class="btn">Confirm</button>
           </div>
         </form>

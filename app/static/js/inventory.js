@@ -1,3 +1,12 @@
+// Ask before the browser leaves the page with unsaved edits.
+let itemFormSnapshot = null;
+window.addEventListener('beforeunload', e => {
+  if (itemFormDirty()) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
 $(document).ready(function () {
   $('#edit-form').on('submit', function (e) {
     e.preventDefault();
@@ -37,8 +46,12 @@ $(document).ready(function () {
     const file = $('#item-image')[0]?.files?.[0];
     if (file) body.append('image', file);
 
+    const removeImage = itemId && overlay.data('remove-image') && !file;
+
     post(endpoint, body)
+      .then(() => removeImage && post(`/admin/api/items/${itemId}/image`, undefined, 'DELETE'))
       .then(() => {
+        itemFormSnapshot = null;
         dismissOverlay();
         location.reload();
       })
@@ -74,8 +87,29 @@ function showOverlay(item) {
   // Store item ID in overlay for later use
   const overlay = $('.overlay');
   overlay.data('id', item.id || '');
-  
+
+  itemFormSnapshot = itemFormState();
   revealOverlay();
+}
+
+// Everything the edit form would save, for spotting unsaved changes.
+function itemFormState() {
+  const fields = $('#edit-form').find('input, select, textarea').map(function () {
+    return this.type === 'checkbox' ? this.checked : this.value;
+  }).get();
+  return JSON.stringify([fields, !!$('.overlay').data('remove-image')]);
+}
+
+function itemFormDirty() {
+  return itemFormSnapshot !== null && itemFormState() !== itemFormSnapshot;
+}
+
+function closeItemForm() {
+  if (itemFormDirty() && !confirm('Discard your unsaved changes?')) {
+    return;
+  }
+  itemFormSnapshot = null;
+  dismissOverlay();
 }
 
 function deleteItem(itemId, title) {
@@ -151,10 +185,21 @@ function chosenImageError() {
 
 function showImagePreview(item) {
   const preview = $('#item-image-preview');
+  const hasImage = !!(item && item.id && item.has_image);
   $('#item-image').val('');
-  if (item && item.id && item.has_image) {
-    preview.attr('src', `/items/${item.id}/image`).prop('hidden', false);
+  $('.overlay').data('remove-image', false);
+  $('#item-image-current').prop('hidden', !hasImage);
+  $('#item-image-upload').prop('hidden', hasImage);
+  if (hasImage) {
+    preview.attr('src', `/items/${item.id}/image`);
   } else {
-    preview.removeAttr('src').prop('hidden', true);
+    preview.removeAttr('src');
   }
+}
+
+// Swap the image for the file picker.
+function removeItemImage() {
+  $('.overlay').data('remove-image', true);
+  $('#item-image-current').prop('hidden', true);
+  $('#item-image-upload').prop('hidden', false);
 }
