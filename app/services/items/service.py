@@ -64,16 +64,28 @@ def get_all_user_visible_items(
         return sorted(items, key=lambda item: item['available_count'] <= 0)
 
 
-def _shown(session: Session, field: str, value: Any) -> str:
-    """A value as the audit log should read it."""
+def _shown(session: Session, field: str, value: Any) -> str | None:
+    """Format a value for the audit log."""
     if value is None or value == '':
-        return 'none'
+        return None
     if isinstance(value, bool):
         return 'yes' if value else 'no'
     if field == 'category_id':
         category = session.get(Category, uuid.UUID(str(value)))
         return category.category if category else str(value)
     return str(value)
+
+
+def _audit_edit(
+    session: Session, acting_crsid: str, item: Item, changes: dict[str, Any]
+) -> None:
+    session.add(
+        Audit(
+            actor_crsid=acting_crsid,
+            message=f'Edited existing item: {item.title}',
+            extra={'item_id': str(item.id), 'changes': changes},
+        )
+    )
 
 
 def create_item(
@@ -106,8 +118,9 @@ def update_item(
         item = session.query(Item).filter(Item.id == item_id).first()
         if not item:
             return False
+        previous_image = ''
         if image is not None:
-            image_service.save(session, item_id, image)
+            previous_image = image_service.save(session, item_id, image)
 
         new_data = data.model_dump()
         fields = [f for f in _AUDITED_FIELDS if f in new_data]
@@ -120,15 +133,28 @@ def update_item(
             # leave out unchanged fields
             if after != before[f]:
                 changes[f] = {'before': before[f], 'after': after}
+        if image is not None and previous_image != image.checksum:
+            changes['image'] = {
+                'before': previous_image,
+                'after': image.checksum,
+            }
 
         if changes:
-            session.add(
-                Audit(
-                    actor_crsid=acting_crsid,
-                    message=f'Edited existing item: {item.title}',
-                    extra={'item_id': str(item_id), 'changes': changes},
-                )
-            )
+            _audit_edit(session, acting_crsid, item, changes)
+        return True
+
+
+def remove_item_image(item_id: uuid.UUID, acting_crsid: str) -> bool:
+    with db_session() as session:
+        item = session.query(Item).filter(Item.id == item_id).first()
+        if not item:
+            return False
+        removed = image_service.delete(session, item_id)
+        if removed is None:
+            return False
+        _audit_edit(
+            session, acting_crsid, item, {'image': {'before': removed, 'after': None}}
+        )
         return True
 
 

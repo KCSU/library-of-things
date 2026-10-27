@@ -10,6 +10,7 @@ from app.common.auth import role_required
 from app.config import IMAGE_CONTENT_TYPE
 from app.models import Role
 from app.services.images import service as image_service
+from app.services.items import service as item_service
 
 images_bp = Blueprint('images', __name__)
 
@@ -17,7 +18,7 @@ images_bp = Blueprint('images', __name__)
 @images_bp.route('/admin/api/items/<uuid:item_id>/image', methods=['DELETE'])
 @role_required(Role.LIBRARIAN)
 def api_delete_item_image(user: dict[str, Any], item_id: UUID) -> ResponseReturnValue:
-    if not image_service.delete(item_id):
+    if not item_service.remove_item_image(item_id, user['crsid']):
         return jsonify({'error': 'No image to remove'}), 404
     return jsonify({'success': True})
 

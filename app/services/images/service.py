@@ -28,10 +28,11 @@ def encode_upload(file_storage: FileStorage) -> WebPImageBytes:
         raise ValueError(f'Unsupported image: {exc}') from exc
 
 
-def save(session: Session, item_id: uuid.UUID, encoded: WebPImageBytes) -> None:
+def save(session: Session, item_id: uuid.UUID, encoded: WebPImageBytes) -> str | None:
     """Set an item's image, replacing any existing one, in the caller's
-    transaction."""
+    transaction. Returns the replaced image's checksum, if any."""
     image = session.query(ItemImage).filter(ItemImage.item_id == item_id).first()
+    previous = image.checksum if image else None
     if image is None:
         image = ItemImage(item_id=item_id)
         session.add(image)
@@ -41,6 +42,7 @@ def save(session: Session, item_id: uuid.UUID, encoded: WebPImageBytes) -> None:
     image.width = encoded.width
     image.height = encoded.height
     image.checksum = encoded.checksum
+    return previous
 
 
 @log_slow
@@ -53,8 +55,11 @@ def fetch(item_id: uuid.UUID) -> tuple[bytes, str] | None:
         return image.content, image.checksum
 
 
-def delete(item_id: uuid.UUID) -> bool:
-    with db_session() as session:
-        return bool(
-            session.query(ItemImage).filter(ItemImage.item_id == item_id).delete()
-        )
+def delete(session: Session, item_id: uuid.UUID) -> str | None:
+    """Remove an item's image in the caller's transaction. Returns the removed
+    image's checksum, if any."""
+    image = session.query(ItemImage).filter(ItemImage.item_id == item_id).first()
+    if image is None:
+        return None
+    session.delete(image)
+    return image.checksum
