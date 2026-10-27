@@ -18,7 +18,7 @@ dependencies = [
     "pydantic==2.12.5",
     "psycopg[binary]==3.3.6",
     "sqlalchemy-cockroachdb==2.0.3",
-    "certifi==2026.7.22",
+    "certifi==2026.10.18",
 ]
 
 [dependency-groups]
